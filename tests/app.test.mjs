@@ -58,8 +58,13 @@ test("index.html includes Cult brand treatment and illustration hooks", async ()
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 
   assert.match(html, /aria-label="Cult brand"/);
+  assert.match(html, /class="brand-lockup"/);
+  assert.match(html, /class="product-wordmark"/);
+  assert.match(html, /class="product-wordmark-kicker">CULT<\/span>/);
+  assert.match(html, /<h1 class="product-wordmark-title">FUEL LOG<\/h1>/);
   assert.match(html, /aurora-illustration/);
   assert.doesNotMatch(html, /Aurora design language/);
+  assert.doesNotMatch(html, /<h1>Cult Fuel Log<\/h1>/);
   assert.doesNotMatch(html, /circle cx="78" cy="90" r="46"/);
   assert.doesNotMatch(html, /circle cx="236" cy="76" r="58"/);
   assert.doesNotMatch(html, /path d="M86 219c24-48 49-86 77-114 15-14 35-29 60-45"/);
