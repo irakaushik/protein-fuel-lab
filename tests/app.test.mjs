@@ -202,15 +202,15 @@ test("index.html contains the animated Cult Fuel Log logo shell", async () => {
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 
   assert.match(html, /id="cult-fuel-logo"/);
-  assert.match(html, /class="vman-mark"/);
+  assert.match(html, /class="brand-logo-image"/);
   assert.match(html, /FUEL LOG/);
 });
 
-test("index.html uses a cult.fit wordmark in the brand lockup", async () => {
+test("index.html uses Cult's public header logo asset in the brand lockup", async () => {
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 
-  assert.match(html, /cult\.fit/i);
-  assert.doesNotMatch(html, /brand-chip-label">CULT</);
+  assert.match(html, /vman-and-white-cult-text/);
+  assert.doesNotMatch(html, /class="vman-mark"/);
 });
 
 test("index.html includes profile recalculation and Cult Transform sections", async () => {
@@ -277,6 +277,15 @@ test("index.html removes the old crossing hero illustration strokes over the pro
 
   assert.doesNotMatch(html, /id="hero-line"/);
   assert.doesNotMatch(html, /M86 219c24-48 49-86 77-114/);
+});
+
+test("index.html keeps the right-side hero illustration minimal and free of extra decorative strokes", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+
+  assert.doesNotMatch(html, /M90 250c24 14 48 21 73 21 40 0 74-10 110-31/);
+  assert.doesNotMatch(html, /M96 102c11-14 23-24 39-33/);
+  assert.doesNotMatch(html, /M207 74c18 10 33 24 45 42/);
+  assert.doesNotMatch(html, /circle cx="230" cy="214" r="30"/);
 });
 
 test("index.html exposes the clearer sectioned information architecture", async () => {
