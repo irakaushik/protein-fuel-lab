@@ -249,3 +249,18 @@ test("styles.css includes reduced motion handling for the animated logo", async 
   assert.match(css, /@keyframes vman-pulse/);
   assert.match(css, /@keyframes wordmark-shimmer/);
 });
+
+test("index.html exposes the optional calorie helper and profile recalculation CTA", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+
+  assert.match(html, /id="calorie-helper"/);
+  assert.match(html, /id="recalculate-profile"/);
+});
+
+test("index.html keeps manual log and scan CTAs after the layout refresh", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+
+  assert.match(html, /Log meal/);
+  assert.match(html, /Scan meal/);
+  assert.match(html, /Meal timeline/);
+});
