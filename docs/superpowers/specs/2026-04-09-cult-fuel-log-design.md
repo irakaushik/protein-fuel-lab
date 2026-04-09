@@ -7,16 +7,16 @@ Positioning: A new Cult-branded protein-first logging product built in the Auror
 
 ## 1. Summary
 
-Cult Fuel Log is a mobile-first protein tracker prototype that helps users hit their daily protein goals with minimal friction. The product centers on a high-impact hero dashboard, supported by guided onboarding, fast manual logging, and AI-assisted meal scan flows.
+Cult Fuel Log is a mobile-first protein tracker prototype that helps users hit their daily protein goals with minimal friction. The product centers on a high-impact hero dashboard, supported by guided onboarding, fast manual logging, AI-assisted meal scan flows, and lightweight recalculators for targets.
 
-The prototype should feel like a fresh Cult product rather than a clone of Cult Peak. It should use Cult's Aurora design principles: bold, energetic, immersive, intent-driven, and visually premium.
+The prototype should feel like a fresh Cult product rather than a clone of Cult Peak. It should use Cult's Aurora principles verified from public Cult references: bold, energetic, immersive, intent-driven, glass-led, and motion-aware.
 
 The MVP experience is a hybrid:
 
 - Hero-first in presentation
 - Flow-first in interaction quality
 
-This means the dashboard is the visual centerpiece, while onboarding, manual logging, scan review, and confirmation flows receive enough depth to make the product feel believable and production-oriented.
+This means the dashboard is the visual centerpiece, while onboarding, manual logging, scan review, profile recalculation, and confirmation flows receive enough depth to feel believable and implementation-ready.
 
 ## 2. Product Goals
 
@@ -25,6 +25,7 @@ Primary goals:
 - Make daily protein progress instantly visible
 - Let users log common meals in under 15 seconds
 - Reduce manual effort through recents, defaults, and meal scanning
+- Help users understand and recalculate both protein and calorie targets
 - Deliver a Cult-style premium product feel through Aurora UI
 
 Success criteria:
@@ -32,6 +33,7 @@ Success criteria:
 - Protein consumed, goal, remaining, and completion are visible at all times on the main screen
 - Manual logging is fast and dependable
 - Scan flow feels magical but remains editable and trustworthy
+- Protein and calorie targets can be suggested during onboarding and recalculated later in Profile
 - The product feels distinctive, bold, and energetic rather than like a generic calorie tracker
 
 ## 3. Product Decisions Locked
@@ -40,9 +42,14 @@ Success criteria:
 - Experience structure: hero dashboard plus stronger guided flows
 - Brand direction: new Cult product, not a direct Cult Peak clone
 - Visual system: Cult Aurora-inspired
+- Logo direction: animated V-Man plus wordmark
+- Logo placement: compact icon beside `FUEL LOG`
+- Logo motion: continuous but restrained loop
 - Food coverage: mixed Indian and global
 - Manual logging: production-grade nutrition database target
 - Image scanning: real AI-assisted feature with editable, estimate-based results
+- Calculators: protein and calorie calculators in onboarding and later in Profile
+- Cult Transform: premium feature card linking out to `https://www.cult.fit/fitness/cult-transform`
 
 ## 4. Experience Principles
 
@@ -63,6 +70,9 @@ The visual system should feel immersive, athletic, and premium without becoming 
 5. Motivating, not judgmental
 Copy should guide and encourage, not shame or medicalize.
 
+6. Helpful calculators, not fake precision
+Target recommendations should feel useful and understandable, while still staying editable and optional.
+
 ## 5. Information Architecture
 
 The app should use a lightweight mobile-first structure:
@@ -79,11 +89,13 @@ The primary screen stack:
 4. Scan Meal Flow
 5. Meal Review / Edit
 6. Day History
+7. Profile / Recalculate Targets
 
 Navigation model:
 
 - Bottom nav with `Today`, `History`, `Profile`
 - `Log meal` and `Scan meal` stay highly visible on `Today`
+- Day switching uses segmented chips: `Today`, `Yesterday`, `Calendar`
 - Logging tasks open as full-screen overlays or stacked mobile screens
 - After save, the user returns to `Today` and sees immediate progress updates
 
@@ -97,13 +109,23 @@ Purpose:
 - collect activity level
 - collect goal type: maintain, lose, gain
 - recommend protein goal
-- optionally recommend calorie goal
+- recommend calorie goal when enough inputs are present
+
+Required input model:
+
+- weight
+- goal type
+- activity level
+- sex
+- age
+- height
 
 Behavior:
 
 - Default values should feel helpful rather than demanding
 - Recommended protein should be editable
-- Optional calorie goal should be editable or skippable
+- Recommended calorie target should be editable
+- Calorie recommendation may remain blank if users skip the needed inputs
 - The flow should feel guided and reassuring, not clinical
 
 ### 6.2 Hero Dashboard
@@ -114,6 +136,7 @@ Purpose:
 
 Required content:
 
+- animated V-Man plus `CULT / FUEL LOG` wordmark
 - protein hero ring or radial progress component
 - consumed protein
 - protein goal
@@ -191,6 +214,36 @@ Required behavior:
 - show meals with per-meal protein and calories
 - show totals for the day
 
+### 6.7 Profile / Recalculate Targets
+
+Purpose:
+
+- let users update their targets later without replaying full onboarding
+
+Required behavior:
+
+- show current protein target
+- show current calorie target
+- expose `Recalculate targets`
+- allow editing or overriding both recommendations
+- apply changes to dashboard immediately after confirmation
+
+### 6.8 Cult Transform Feature Card
+
+Purpose:
+
+- provide a premium adjacent path into the broader Cult transformation offering
+
+Required content:
+
+- eyebrow: `Continue with Cult`
+- title: `Go beyond logging with Cult Transform`
+- short supporting copy about structured coaching and accountability
+- 2 or 3 compact benefit points
+- primary CTA linking to `https://www.cult.fit/fitness/cult-transform`
+
+This should feel like a curated product extension, not an advertisement pasted into the page.
+
 ## 7. Key User Flows
 
 ### 7.1 Setup Flow
@@ -198,8 +251,9 @@ Required behavior:
 1. User opens app
 2. User enters basics
 3. App recommends protein target
-4. User confirms or edits target
-5. User lands on Today dashboard
+4. App recommends calorie target when inputs are sufficient
+5. User confirms or edits targets
+6. User lands on Today dashboard
 
 ### 7.2 Manual Logging Flow
 
@@ -226,6 +280,22 @@ Required behavior:
 3. User checks the meal timeline
 4. User edits a meal or adds another one
 
+### 7.5 Recalculate Targets Flow
+
+1. User opens Profile
+2. User taps `Recalculate targets`
+3. User updates weight, age, height, sex, activity, or goal
+4. App returns updated protein and calorie recommendations
+5. User accepts or edits them
+6. Dashboard updates immediately
+
+### 7.6 Cult Transform Referral Flow
+
+1. User sees the Cult Transform card after daily summary
+2. User reads the program positioning
+3. User taps `Open in Cult app`
+4. User is taken to `https://www.cult.fit/fitness/cult-transform`
+
 ## 8. Visual System
 
 The visual style should follow Cult's Aurora principles verified from public Cult design references: bold, energetic, immersive, and intent-driven.
@@ -233,12 +303,14 @@ The visual style should follow Cult's Aurora principles verified from public Cul
 Visual direction:
 
 - dark, high-contrast base surfaces
-- warm aurora gradients led by orange and amber
-- controlled lime and teal highlights for energy
+- black-led base with deep blue atmospheric shadows
+- blue and yellow as the dominant aurora lights
+- white for logo and text contrast
+- pink used sparingly as an energy accent rather than a dominant glow
 - glassmorphic panels and overlays
 - large typography for protein numbers and calls to action
 - generous negative space
-- purposeful motion on progress, confirmation, and transitions
+- purposeful motion on progress, confirmation, transitions, and brand identity
 
 The interface should feel:
 
@@ -253,6 +325,35 @@ It should not feel:
 - spreadsheet-like
 - bodybuilding-heavy
 - generic wellness-app soft
+
+### 8.1 Animated Logo System
+
+Logo structure:
+
+- compact V-Man icon on the left
+- small `CULT` kicker
+- bold `FUEL LOG` wordmark
+
+Animation behavior:
+
+- continuous loop
+- subtle aurora glow pass through the V-Man
+- very small pulse or breathing scale
+- optional soft shimmer across the wordmark
+- reduced-motion users receive a static or near-static version
+
+Motion constraints:
+
+- no spinning
+- no bouncing
+- no loud morphing
+- no readability loss in the wordmark
+
+The effect should feel alive, premium, and aurora-lit rather than flashy.
+
+Note:
+
+- the V-Man is a publicly described part of Cult's broader branding, but this implementation should use a clean, simplified product-safe version rather than assume access to a protected production asset
 
 ## 9. Content And Food Coverage
 
@@ -276,6 +377,9 @@ Search, recents, and scan examples should include both Indian and global foods s
 ### UserProfile
 
 - weight
+- height
+- age
+- sex
 - activityLevel
 - goalType
 - proteinGoal
@@ -299,7 +403,7 @@ Search, recents, and scan examples should include both Indian and global foods s
 - name
 - items[]
 - totals
-- imageUrl?
+- optional imageUrl
 
 ### FoodItem
 
@@ -355,6 +459,31 @@ However, image scan should still be framed as estimate-based because:
 
 Therefore the product must communicate that scan outputs are helpful estimates, not medical-grade nutritional facts.
 
+### 11.3 Target Calculation Strategy
+
+Protein target calculation should stay simple and quick:
+
+- weight
+- goal type
+- activity level
+
+Calorie intake calculation should be fuller and more explicit:
+
+- sex
+- age
+- height
+- weight
+- activity level
+- goal type
+
+Recommended calorie logic should produce:
+
+- maintenance calories
+- suggested calorie target for lose / maintain / gain
+- editable final target
+
+The calorie calculator may be left incomplete or blank if users do not know the required inputs yet. In that case the app should avoid fake precision and defer calorie guidance until Profile or later setup.
+
 ## 12. Trust And Safety Boundaries
 
 The app should be trustworthy without overclaiming.
@@ -407,22 +536,31 @@ Required states:
 
 - allow nutrition save without image persistence
 
+### Calorie input unknown
+
+- allow calorie target to remain blank
+- keep protein visible as the primary metric
+- prompt user to calculate or set calorie target later from Profile
+
 ## 14. MVP Scope
 
 Included:
 
 - goal setup with protein recommendation
-- optional calorie goal
+- calorie intake calculator and editable calorie goal
+- protein target calculator available during onboarding and later in Profile
 - hero dashboard
+- animated V-Man plus wordmark logo treatment
 - manual logging with search and recents
 - AI-assisted scan flow with editable estimates
+- Cult Transform feature card
 - day history
 - meal edit and delete
 - Aurora-aligned visual system
 
 Excluded:
 
-- advanced coaching plans
+- advanced coaching plans inside Fuel Log
 - streak systems
 - social features
 - wearables integration
@@ -437,7 +575,9 @@ The prototype should demonstrate:
 - believable guided onboarding
 - dependable manual logging
 - impressive but honest AI-assisted scan flow
+- helpful target calculation
 - immediate progress feedback after every meal
+- a premium, continuously animated brand lockup
 
 The prototype should not require users to imagine the product. The core screens and transitions should be polished enough to feel pitch-ready and implementation-ready.
 
@@ -448,17 +588,18 @@ Recommended build shape for implementation planning:
 - mobile-first responsive web app
 - local-first prototype state acceptable
 - modular screen components
-- reusable macro cards, meal cards, progress modules, and action sheets
-- clear separation between food database logic and image-scan logic
+- reusable macro cards, meal cards, progress modules, calculator forms, and action sheets
+- clear separation between food database logic, target-calculation logic, and image-scan logic
 
 Suggested implementation slices:
 
-1. app shell and Aurora design system
-2. onboarding and goal setup
+1. app shell, animated logo, and Aurora design system
+2. onboarding with protein and calorie calculators
 3. dashboard and daily totals
 4. manual logging flow
 5. scan flow and editable review
-6. history and meal editing
+6. Cult Transform card and referral section
+7. history, profile, and target recalculation
 
 ## 17. Testing Expectations
 
@@ -466,9 +607,11 @@ The implementation plan should include:
 
 - interaction tests for core flows
 - state update checks for protein totals
+- state update checks for calorie totals and recalculation
 - empty/error/edit states
 - responsive validation for mobile and desktop
-- visual validation of Aurora hierarchy and CTA clarity
+- visual validation of Aurora hierarchy, motion restraint, and CTA clarity
+- reduced-motion behavior for the animated logo
 
 ## 18. Open Decisions Deferred
 
@@ -479,3 +622,4 @@ These decisions should be left open for implementation planning rather than bloc
 - image storage backend choice
 - analytics stack details
 - notification implementation details
+- whether Cult Transform opens as web link or deep link when the Cult app is installed
