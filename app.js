@@ -378,21 +378,18 @@ function applyRecommendedTargets(profile, { forceCalorie = false } = {}) {
 }
 
 function showScreen(target) {
-  const profilePanel = document.querySelector("#profile-panel");
-  profilePanel.hidden = target !== "profile";
-
   if (target === "today") {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    document.querySelector("#track-section").scrollIntoView({ behavior: "smooth", block: "start" });
     return;
   }
 
   if (target === "history") {
-    document.querySelector(".timeline-section").scrollIntoView({ behavior: "smooth", block: "start" });
+    document.querySelector("#history-section").scrollIntoView({ behavior: "smooth", block: "start" });
     return;
   }
 
   if (target === "profile") {
-    profilePanel.scrollIntoView({ behavior: "smooth", block: "start" });
+    document.querySelector("#profile-panel").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 }
 
@@ -437,11 +434,14 @@ function renderApp(state, uiState) {
   document.querySelector("#meal-timeline").innerHTML = renderMealTimeline(visibleMeals);
   document.querySelector("#day-heading-eyebrow").textContent = getDayHeading(uiState.dayKey);
 
-  document.querySelector("#setup-card").classList.toggle("is-hidden", state.profile.completedOnboarding);
   document.querySelector("#weight-input").value = String(state.profile.weightKg);
   document.querySelector("#weight-label").textContent = `${state.profile.weightKg} kg`;
   document.querySelector("#height-input").value = String(state.profile.heightCm);
   document.querySelector("#age-input").value = String(state.profile.age);
+  document.querySelector("#profile-protein-target").textContent = `${state.profile.proteinGoal}g / day`;
+  document.querySelector("#profile-calorie-target").textContent = state.profile.calorieGoal == null
+    ? "Optional target"
+    : `${state.profile.calorieGoal} kcal target`;
   document.querySelector("#recommended-goal").textContent = `${recommendation.target}g/day recommended • ${recommendation.rangeLabel}`;
   document.querySelector("#recommended-calories").textContent = calorieRecommendation?.helperLabel
     ?? "Add age, height, and sex to estimate calories";
@@ -449,10 +449,6 @@ function renderApp(state, uiState) {
   document.querySelector("#calorie-helper").textContent = calorieRecommendation?.helperLabel
     ?? "We will calculate this if you know your basics.";
   document.querySelector("#image-storage").checked = state.profile.storeMealImages;
-  document.querySelector("#profile-weight-input").value = String(state.profile.weightKg);
-  document.querySelector("#profile-height-input").value = String(state.profile.heightCm);
-  document.querySelector("#profile-age-input").value = String(state.profile.age);
-  document.querySelector("#profile-panel").hidden = uiState.activeNav !== "profile";
   setActivePills(state.profile, uiState);
 
   document.querySelector("#manual-sheet").classList.toggle("is-open", uiState.manualOpen);
@@ -550,16 +546,16 @@ function initializeApp() {
   });
 
   document.querySelector("#apply-profile").addEventListener("click", () => {
-    applyRecommendedTargets(state.profile);
-    state.profile.completedOnboarding = true;
     saveState(state);
     renderApp(state, uiState);
+    showToast("Profile saved");
   });
 
-  document.querySelector("#skip-setup").addEventListener("click", () => {
-    state.profile.completedOnboarding = true;
+  document.querySelector("#recalculate-profile").addEventListener("click", () => {
+    applyRecommendedTargets(state.profile, { forceCalorie: true });
     saveState(state);
     renderApp(state, uiState);
+    showToast("Targets recalculated");
   });
 
   document.querySelector("#cult-fuel-logo").addEventListener("click", () => {
@@ -696,17 +692,6 @@ function initializeApp() {
     uiState.scanMultiplier = 1;
     renderApp(state, uiState);
     showToast("Scan saved to today");
-  });
-
-  document.querySelector("#recalculate-profile").addEventListener("click", () => {
-    state.profile.weightKg = Number(document.querySelector("#profile-weight-input").value);
-    state.profile.heightCm = Number(document.querySelector("#profile-height-input").value);
-    state.profile.age = Number(document.querySelector("#profile-age-input").value);
-
-    applyRecommendedTargets(state.profile, { forceCalorie: true });
-    saveState(state);
-    renderApp(state, uiState);
-    showToast("Targets recalculated");
   });
 
   document.querySelector("#meal-timeline").addEventListener("click", (event) => {

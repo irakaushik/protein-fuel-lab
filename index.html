@@ -17,203 +17,224 @@
     <main class="app-shell">
       <header class="topbar">
         <button class="brand-lockup" id="cult-fuel-logo" type="button" aria-label="Cult Fuel Log home">
-          <span class="vman-mark" aria-hidden="true">
-            <svg viewBox="0 0 64 64" role="presentation">
-              <path d="M10 16 31 48 54 16" />
-              <path d="M22 16 31 29 42 16" />
-            </svg>
+          <span class="brand-chip">
+            <span class="vman-mark" aria-hidden="true">
+              <svg viewBox="0 0 64 64" role="presentation">
+                <path d="M12 18 31 46 50 18" />
+                <path d="M24 18 31 29 38 18" />
+              </svg>
+            </span>
+            <span class="brand-chip-label">cult.fit</span>
           </span>
           <span class="brand-copy">
-            <small>CULT</small>
-            <strong>FUEL LOG</strong>
+            <strong>CULT FUEL LOG</strong>
           </span>
         </button>
       </header>
 
-      <section class="setup-card" id="setup-card">
-        <div class="setup-copy">
-          <p class="eyebrow">Set your daily target</p>
-          <h2>Build your fuel profile in under 20 seconds.</h2>
-          <p>We recommend a protein target from your weight, goal, and training load, then keep it editable.</p>
-          <div class="aurora-illustration setup-illustration" aria-hidden="true">
-            <svg viewBox="0 0 320 180" role="presentation">
-              <defs>
-                <linearGradient id="setup-glow" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#ff8f32" />
-                  <stop offset="100%" stop-color="#43e7c5" />
-                </linearGradient>
-              </defs>
-              <circle cx="78" cy="90" r="46" fill="rgba(255,143,50,0.16)" />
-              <circle cx="236" cy="76" r="58" fill="rgba(67,231,197,0.12)" />
-              <path d="M48 124c31-28 66-41 105-41 35 0 68 10 118 36" stroke="url(#setup-glow)" stroke-width="10" stroke-linecap="round" fill="none"/>
-              <rect x="56" y="48" width="68" height="44" rx="16" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.18)" />
-              <rect x="154" y="34" width="112" height="64" rx="24" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.14)" />
-              <path d="M193 67h34" stroke="#bcff6b" stroke-width="10" stroke-linecap="round" />
-              <path d="M87 68h14" stroke="#ffc76b" stroke-width="10" stroke-linecap="round" />
-            </svg>
+      <section class="profile-panel glass-card" id="profile-panel">
+        <div class="section-heading section-heading-stack">
+          <div>
+            <p class="eyebrow section-tag">MY PROFILE</p>
+            <h2>Protein and calorie targets that stay visible.</h2>
           </div>
+          <p class="section-copy">Use the calculators to set your targets, keep calories optional, and update your profile any time.</p>
         </div>
 
-        <div class="setup-controls">
-          <label class="control-block" for="weight-input">
-            <span>Weight</span>
-            <strong id="weight-label">72 kg</strong>
-          </label>
-          <input id="weight-input" type="range" min="45" max="120" value="72">
+        <div class="profile-card-grid">
+          <article class="profile-tool profile-tool-protein">
+            <div class="tool-heading">
+              <div>
+                <p class="eyebrow">Protein calculator</p>
+                <h3>Build your protein goal from your training load.</h3>
+              </div>
+              <strong class="tool-target" id="profile-protein-target">158g / day</strong>
+            </div>
+            <p class="tool-copy">Weight, goal, and activity adjust your daily protein recommendation in real time.</p>
 
-          <div class="inline-fields">
-            <label class="control-block" for="height-input">
-              <span>Height</span>
-              <input id="height-input" type="number" min="140" max="210" value="178">
+            <label class="control-block" for="weight-input">
+              <span>Weight</span>
+              <strong id="weight-label">72 kg</strong>
             </label>
-            <label class="control-block" for="age-input">
-              <span>Age</span>
-              <input id="age-input" type="number" min="16" max="80" value="30">
+            <input id="weight-input" type="range" min="45" max="120" value="72">
+
+            <div class="pill-group">
+              <button class="pill-button" data-goal="lose" type="button">Lose</button>
+              <button class="pill-button is-active" data-goal="gain" type="button">Gain</button>
+              <button class="pill-button" data-goal="maintain" type="button">Maintain</button>
+            </div>
+
+            <div class="pill-group">
+              <button class="pill-button" data-activity="light" type="button">Light</button>
+              <button class="pill-button is-active" data-activity="active" type="button">Active</button>
+              <button class="pill-button" data-activity="intense" type="button">Intense</button>
+            </div>
+
+            <p class="recommendation" id="recommended-goal">158g/day recommended</p>
+          </article>
+
+          <article class="profile-tool profile-tool-calorie">
+            <div class="tool-heading">
+              <div>
+                <p class="eyebrow">Calorie calculator</p>
+                <h3>Estimate your calorie target from your basics.</h3>
+              </div>
+              <strong class="tool-target" id="profile-calorie-target">Optional target</strong>
+            </div>
+            <p class="tool-copy">Use sex, age, and height for a smarter estimate, or leave calories blank and focus on protein.</p>
+
+            <div class="pill-group" id="sex-group">
+              <button class="pill-button is-active" data-sex="male" type="button">Male</button>
+              <button class="pill-button" data-sex="female" type="button">Female</button>
+            </div>
+
+            <div class="inline-fields">
+              <label class="control-block" for="height-input">
+                <span>Height</span>
+                <input id="height-input" type="number" min="140" max="210" value="178">
+              </label>
+              <label class="control-block" for="age-input">
+                <span>Age</span>
+                <input id="age-input" type="number" min="16" max="80" value="30">
+              </label>
+            </div>
+
+            <label class="control-block" for="calorie-goal">
+              <span>Calorie target</span>
+              <input id="calorie-goal" type="number" min="1200" step="50" value="2200" placeholder="Optional">
+              <small id="calorie-helper">We will calculate this if you know your basics.</small>
             </label>
-          </div>
 
-          <div class="pill-group" id="sex-group">
-            <button class="pill-button is-active" data-sex="male" type="button">Male</button>
-            <button class="pill-button" data-sex="female" type="button">Female</button>
-          </div>
+            <p class="recommendation secondary" id="recommended-calories">2616 kcal maintain • 2866 kcal target</p>
+          </article>
+        </div>
 
-          <div class="pill-group">
-            <button class="pill-button" data-goal="lose" type="button">Lose</button>
-            <button class="pill-button is-active" data-goal="gain" type="button">Gain</button>
-            <button class="pill-button" data-goal="maintain" type="button">Maintain</button>
-          </div>
-
-          <div class="pill-group">
-            <button class="pill-button" data-activity="light" type="button">Light</button>
-            <button class="pill-button is-active" data-activity="active" type="button">Active</button>
-            <button class="pill-button" data-activity="intense" type="button">Intense</button>
-          </div>
-
-          <label class="control-block" for="calorie-goal">
-            <span>Calorie target</span>
-            <input id="calorie-goal" type="number" min="1200" step="50" value="2200" placeholder="Optional">
-            <small id="calorie-helper">We will calculate this if you know your basics.</small>
-          </label>
-
+        <div class="profile-footer">
           <label class="toggle">
             <input id="image-storage" type="checkbox" checked>
             <span>Store meal images for history</span>
           </label>
 
-          <p class="recommendation" id="recommended-goal">158g/day recommended</p>
-          <p class="recommendation secondary" id="recommended-calories">2616 kcal maintain • 2866 kcal target</p>
-
           <div class="setup-actions">
-            <button id="apply-profile" class="primary-action" type="button">Use targets</button>
-            <button id="skip-setup" class="secondary-action" type="button">Skip for now</button>
+            <button class="secondary-action" id="recalculate-profile" type="button">Recalculate targets</button>
+            <button id="apply-profile" class="primary-action" type="button">Save profile</button>
           </div>
         </div>
       </section>
 
-      <section class="hero-card">
-        <div class="hero-copy">
-          <h2 class="hero-title">Today’s protein progress stays in front of every decision.</h2>
-          <p class="hero-subtitle">Fast manual logging, AI-assisted meal scan, and one dashboard that tells you exactly what to eat next.</p>
-          <div class="cta-row">
-            <button class="primary-action" id="open-manual-log" type="button">Log meal</button>
-            <button class="secondary-action" id="open-scan-log" type="button">Scan meal</button>
+      <section class="log-section glass-card" id="log-section">
+        <div class="section-heading section-heading-stack">
+          <div>
+            <p class="eyebrow section-tag">LOG MEAL</p>
+            <h2>Choose the fastest way to add your food.</h2>
           </div>
+          <p class="section-copy">Both flows update today instantly, stay editable, and keep protein front and center.</p>
         </div>
 
-        <div class="hero-meter-wrap">
-          <div class="aurora-illustration hero-illustration" aria-hidden="true">
-            <svg viewBox="0 0 320 320" role="presentation">
-              <defs>
-                <linearGradient id="hero-line" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#43e7c5" />
-                  <stop offset="50%" stop-color="#bcff6b" />
-                  <stop offset="100%" stop-color="#ff8f32" />
-                </linearGradient>
-              </defs>
-              <circle cx="160" cy="160" r="126" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)"/>
-              <circle cx="160" cy="160" r="102" fill="none" stroke="rgba(255,255,255,0.08)"/>
-              <path d="M86 219c24-48 49-86 77-114 15-14 35-29 60-45" stroke="url(#hero-line)" stroke-width="14" stroke-linecap="round" fill="none"/>
-              <path d="M120 92c18 4 36 5 52 4" stroke="#ffc76b" stroke-width="10" stroke-linecap="round" fill="none"/>
-              <path d="M122 247c38 8 73 9 111 0" stroke="rgba(255,255,255,0.18)" stroke-width="8" stroke-linecap="round" fill="none"/>
-              <circle cx="218" cy="94" r="18" fill="rgba(67,231,197,0.16)"/>
-            </svg>
+        <div class="action-grid">
+          <button class="action-card action-card-scan" id="open-scan-log" type="button">
+            <span class="action-card-tag">Option to scan</span>
+            <strong>Scan meal</strong>
+            <span>AI-assisted meal estimates, fully editable before save.</span>
+          </button>
+          <button class="action-card action-card-manual" id="open-manual-log" type="button">
+            <span class="action-card-tag">Option to log</span>
+            <strong>Log from pre-defined list</strong>
+            <span>Frequent Indian and global meals with fast portion controls.</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="track-section" id="track-section">
+        <div class="section-heading section-heading-stack">
+          <div>
+            <p class="eyebrow section-tag">MY TRACK</p>
+            <h2>Protein first. Calories visible. Today in one clean view.</h2>
           </div>
-          <div class="hero-meter">
-          <div class="ring" id="protein-ring">
-            <div class="ring-core">
-              <span id="progress-percent">62%</span>
-              <small>complete</small>
+          <p class="section-copy">See progress, remaining grams, and your full meal timeline without hunting through the page.</p>
+        </div>
+
+        <section class="hero-card">
+          <div class="hero-copy">
+            <h2 class="hero-title">Today’s protein progress stays in front of every decision.</h2>
+            <p class="hero-subtitle">Your dashboard tells you how much you have consumed, how much is left, and what kind of meal can close the gap.</p>
+          </div>
+
+          <div class="hero-meter-wrap">
+            <div class="aurora-illustration hero-illustration" aria-hidden="true">
+              <svg viewBox="0 0 320 320" role="presentation">
+                <circle cx="160" cy="160" r="126" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)"/>
+                <circle cx="160" cy="160" r="102" fill="none" stroke="rgba(255,255,255,0.08)"/>
+                <circle cx="111" cy="103" r="26" fill="rgba(88,166,255,0.12)"/>
+                <circle cx="230" cy="214" r="30" fill="rgba(255,228,92,0.1)"/>
+                <circle cx="237" cy="115" r="16" fill="rgba(255,79,191,0.12)"/>
+                <path d="M90 250c24 14 48 21 73 21 40 0 74-10 110-31" stroke="rgba(255,255,255,0.14)" stroke-width="8" stroke-linecap="round" fill="none"/>
+                <path d="M96 102c11-14 23-24 39-33" stroke="rgba(88,166,255,0.32)" stroke-width="7" stroke-linecap="round" fill="none"/>
+                <path d="M207 74c18 10 33 24 45 42" stroke="rgba(255,228,92,0.32)" stroke-width="7" stroke-linecap="round" fill="none"/>
+              </svg>
+            </div>
+            <div class="hero-meter">
+              <div class="ring" id="protein-ring">
+                <div class="ring-core">
+                  <span id="progress-percent">62%</span>
+                  <small>complete</small>
+                </div>
+              </div>
+              <p class="protein-value" id="consumed-protein">112g</p>
+              <p class="protein-goal" id="protein-goal">158g goal</p>
             </div>
           </div>
-          <p class="protein-value" id="consumed-protein">112g</p>
-          <p class="protein-goal" id="protein-goal">158g goal</p>
-        </div>
-        </div>
+        </section>
+
+        <section class="summary-grid">
+          <article class="glass-card emphasis">
+            <p class="stat-label">Remaining protein</p>
+            <h3 id="remaining-protein">46g left today</h3>
+            <p id="next-action">46g left today. Split it between a chicken rice bowl and an evening shake.</p>
+          </article>
+          <article class="glass-card">
+            <p class="stat-label">Calories</p>
+            <h3 id="remaining-calories">870 kcal remaining</h3>
+            <p id="calorie-copy">Calories stay visible, but protein always leads the page.</p>
+          </article>
+        </section>
+
+        <section class="timeline-section" id="history-section">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow" id="day-heading-eyebrow">Today</p>
+              <h2>Meal timeline</h2>
+            </div>
+            <div class="history-chip-row" id="day-filter">
+              <button class="history-chip is-active" data-day-key="today" type="button">Today</button>
+              <button class="history-chip" data-day-key="yesterday" type="button">Yesterday</button>
+              <button class="history-chip" data-day-key="calendar" type="button">Calendar</button>
+              <input id="calendar-input" type="date" hidden>
+            </div>
+          </div>
+          <div class="meal-timeline" id="meal-timeline"></div>
+        </section>
       </section>
 
-      <section class="summary-grid">
-        <article class="glass-card emphasis">
-          <p class="stat-label">Remaining protein</p>
-          <h3 id="remaining-protein">46g left today</h3>
-          <p id="next-action">46g left today. Split it between a chicken rice bowl and an evening shake.</p>
-        </article>
-        <article class="glass-card">
-          <p class="stat-label">Calories</p>
-          <h3 id="remaining-calories">870 kcal remaining</h3>
-          <p id="calorie-copy">Calories stay visible, but protein always leads the page.</p>
-        </article>
-      </section>
-
-      <section class="timeline-section">
-        <div class="section-heading">
+      <section class="support-section" id="support-section">
+        <div class="section-heading section-heading-stack">
           <div>
-            <p class="eyebrow" id="day-heading-eyebrow">Today</p>
-            <h2>Meal timeline</h2>
-          </div>
-          <div class="history-chip-row" id="day-filter">
-            <button class="history-chip is-active" data-day-key="today" type="button">Today</button>
-            <button class="history-chip" data-day-key="yesterday" type="button">Yesterday</button>
-            <button class="history-chip" data-day-key="calendar" type="button">Calendar</button>
-            <input id="calendar-input" type="date" hidden>
+            <p class="eyebrow section-tag">NUTRITION SUPPORT</p>
+            <h2>Cult Transform will help you with further nutritionist support.</h2>
           </div>
         </div>
-        <div class="meal-timeline" id="meal-timeline"></div>
-      </section>
 
-      <section class="transform-card glass-card">
-        <p class="eyebrow">Continue with Cult</p>
-        <h2>Go beyond logging with Cult Transform</h2>
-        <p>Structured coaching, accountability, and progression if you want a bigger change than logging alone.</p>
-        <ul class="transform-list">
-          <li>Goal-led coaching</li>
-          <li>Habit and nutrition accountability</li>
-          <li>Structured training journey</li>
-        </ul>
-        <a class="primary-action transform-link" href="https://www.cult.fit/fitness/cult-transform" target="_blank" rel="noreferrer">Open in Cult app</a>
-      </section>
-
-      <section class="profile-panel glass-card" id="profile-panel" hidden>
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Profile</p>
-            <h2>Recalculate targets</h2>
-          </div>
-          <button class="secondary-action" id="recalculate-profile" type="button">Recalculate targets</button>
-        </div>
-        <div class="profile-grid">
-          <label class="control-block" for="profile-weight-input">
-            <span>Weight</span>
-            <input id="profile-weight-input" type="number" min="45" max="120" value="72">
-          </label>
-          <label class="control-block" for="profile-height-input">
-            <span>Height</span>
-            <input id="profile-height-input" type="number" min="140" max="210" value="178">
-          </label>
-          <label class="control-block" for="profile-age-input">
-            <span>Age</span>
-            <input id="profile-age-input" type="number" min="16" max="80" value="30">
-          </label>
-        </div>
+        <section class="transform-card glass-card">
+          <p class="eyebrow">Continue with Cult</p>
+          <h2>Cult Transform</h2>
+          <p>Structured coaching, accountability, and nutritionist support if you want more than self-tracking.</p>
+          <ul class="transform-list">
+            <li>Goal-led coaching</li>
+            <li>Habit and nutrition accountability</li>
+            <li>Structured training journey</li>
+          </ul>
+          <a class="primary-action transform-link" href="https://www.cult.fit/fitness/cult-transform" target="_blank" rel="noreferrer">Open Cult Transform</a>
+        </section>
       </section>
 
       <div class="sheet-backdrop" id="sheet-backdrop" hidden></div>

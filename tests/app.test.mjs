@@ -65,7 +65,7 @@ test("index.html contains the primary product CTAs", async () => {
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 
   assert.match(html, /Cult Fuel Log/);
-  assert.match(html, /Log meal/);
+  assert.match(html, /LOG MEAL/);
   assert.match(html, /Scan meal/);
   assert.match(html, /Today/);
 });
@@ -206,12 +206,19 @@ test("index.html contains the animated Cult Fuel Log logo shell", async () => {
   assert.match(html, /FUEL LOG/);
 });
 
+test("index.html uses a cult.fit wordmark in the brand lockup", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+
+  assert.match(html, /cult\.fit/i);
+  assert.doesNotMatch(html, /brand-chip-label">CULT</);
+});
+
 test("index.html includes profile recalculation and Cult Transform sections", async () => {
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 
   assert.match(html, /id="profile-panel"/);
   assert.match(html, /Recalculate targets/);
-  assert.match(html, /Go beyond logging with Cult Transform/);
+  assert.match(html, /Cult Transform/);
   assert.match(html, /https:\/\/www\.cult\.fit\/fitness\/cult-transform/);
 });
 
@@ -260,7 +267,32 @@ test("index.html exposes the optional calorie helper and profile recalculation C
 test("index.html keeps manual log and scan CTAs after the layout refresh", async () => {
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 
-  assert.match(html, /Log meal/);
+  assert.match(html, /Log from pre-defined list/);
   assert.match(html, /Scan meal/);
   assert.match(html, /Meal timeline/);
+});
+
+test("index.html removes the old crossing hero illustration strokes over the progress ring", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+
+  assert.doesNotMatch(html, /id="hero-line"/);
+  assert.doesNotMatch(html, /M86 219c24-48 49-86 77-114/);
+});
+
+test("index.html exposes the clearer sectioned information architecture", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+
+  assert.match(html, />MY PROFILE</);
+  assert.match(html, />LOG MEAL</);
+  assert.match(html, />MY TRACK</);
+  assert.match(html, />NUTRITION SUPPORT</);
+});
+
+test("index.html makes the calculators and logging options explicit", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+
+  assert.match(html, /Protein calculator/);
+  assert.match(html, /Calorie calculator/);
+  assert.match(html, /Log from pre-defined list/);
+  assert.match(html, /Option to scan/);
 });
