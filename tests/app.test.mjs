@@ -16,6 +16,14 @@ import {
   filterMealsByDay,
   formatDayKey,
 } from "../src/logic/day-log.js";
+import {
+  manualSections,
+  searchManualMeals,
+} from "../src/data/manual-catalog.js";
+import {
+  createScanDraft,
+  scanPresetIds,
+} from "../src/data/scan-catalog.js";
 
 test("calculateProteinGoal recommends a higher target for muscle gain", () => {
   const result = calculateProteinGoal({
@@ -160,4 +168,31 @@ test("filterMealsByDay isolates today and yesterday entries", () => {
     ["yesterday"],
   );
   assert.equal(formatDayKey(now), "2026-04-09");
+});
+
+test("manualSections includes both Indian and global grouped suggestions", () => {
+  const titles = manualSections.map((section) => section.title);
+  const flatNames = manualSections.flatMap((section) => section.items.map((item) => item.name));
+
+  assert.ok(titles.includes("Frequent Indian meals"));
+  assert.ok(titles.includes("Frequent global meals"));
+  assert.ok(flatNames.includes("Paneer Bhurji Roll"));
+  assert.ok(flatNames.includes("Grilled Chicken Sandwich"));
+});
+
+test("searchManualMeals filters by name and subtitle", () => {
+  const sections = searchManualMeals("paneer");
+  const names = sections.flatMap((section) => section.items.map((item) => item.name));
+
+  assert.ok(names.includes("Paneer Power Bowl"));
+  assert.ok(names.includes("Paneer Bhurji Roll"));
+});
+
+test("createScanDraft returns an editable scan result with disclaimer copy", () => {
+  const draft = createScanDraft(scanPresetIds[0]);
+
+  assert.equal(draft.disclaimer, "Estimates may vary");
+  assert.ok(Array.isArray(draft.items));
+  assert.ok(draft.items.length > 0);
+  assert.equal(typeof draft.totals.protein, "number");
 });

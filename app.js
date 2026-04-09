@@ -8,89 +8,16 @@ import {
   filterMealsByDay,
   formatDayKey,
 } from "./src/logic/day-log.js";
-
-const manualMealCatalog = [
-  {
-    id: "paneer-power-bowl",
-    name: "Paneer Power Bowl",
-    protein: 42,
-    calories: 460,
-    carbs: 28,
-    fats: 18,
-    subtitle: "Paneer, quinoa, greens, mint yogurt",
-  },
-  {
-    id: "greek-yogurt-crunch",
-    name: "Greek Yogurt Crunch",
-    protein: 32,
-    calories: 330,
-    carbs: 24,
-    fats: 9,
-    subtitle: "Greek yogurt, berries, granola, seeds",
-  },
-  {
-    id: "dal-chilla-stack",
-    name: "Dal Chilla Stack",
-    protein: 28,
-    calories: 370,
-    carbs: 29,
-    fats: 11,
-    subtitle: "Moong dal chilla, hung curd, greens",
-  },
-  {
-    id: "grilled-chicken-sando",
-    name: "Grilled Chicken Sando",
-    protein: 36,
-    calories: 420,
-    carbs: 31,
-    fats: 14,
-    subtitle: "Chicken breast, sourdough, slaw",
-  },
-  {
-    id: "whey-shot",
-    name: "Whey Isolate Shot",
-    protein: 25,
-    calories: 130,
-    carbs: 4,
-    fats: 1,
-    subtitle: "Fastest 25g top-up in the day",
-  },
-];
-
-const scanPresetCatalog = {
-  "power-thali": {
-    id: "power-thali",
-    title: "Power Thali Scan",
-    confidence: "High confidence",
-    caption: "Paneer tikka, dal, and jeera rice",
-    items: [
-      { name: "Paneer tikka", protein: 24, calories: 290, carbs: 8, fats: 16 },
-      { name: "Dal", protein: 12, calories: 180, carbs: 20, fats: 6 },
-      { name: "Jeera rice", protein: 10, calories: 230, carbs: 42, fats: 3 },
-    ],
-  },
-  "chicken-rice": {
-    id: "chicken-rice",
-    title: "Chicken Curry Rice",
-    confidence: "Medium confidence",
-    caption: "Chicken curry and rice bowl",
-    items: [
-      { name: "Chicken curry", protein: 26, calories: 310, carbs: 10, fats: 18 },
-      { name: "Rice", protein: 12, calories: 230, carbs: 36, fats: 1 },
-    ],
-  },
-  brunch: {
-    id: "brunch",
-    title: "Gym Brunch Scan",
-    confidence: "Medium confidence",
-    caption: "Eggs, toast, yogurt, fruit",
-    items: [
-      { name: "Masala omelette", protein: 18, calories: 220, carbs: 6, fats: 14 },
-      { name: "Sourdough toast", protein: 7, calories: 170, carbs: 29, fats: 3 },
-      { name: "Greek yogurt", protein: 15, calories: 140, carbs: 10, fats: 4 },
-    ],
-  },
-};
+import {
+  manualCatalog,
+  findManualMeal,
+  searchManualMeals,
+} from "./src/data/manual-catalog.js";
+import {
+  createScanDraft,
+  scanPresetIds,
+  scanPresets,
+} from "./src/data/scan-catalog.js";
 
 const STORAGE_KEY = "cult-fuel-log-state-v1";
 
@@ -182,8 +109,8 @@ export {
 
 export function buildSeedMeals() {
   return [
-    buildMealFromTemplate(manualMealCatalog[0], 1),
-    buildMealFromTemplate(manualMealCatalog[1], 1),
+    buildMealFromTemplate(findManualMeal("paneer-power-bowl"), 1),
+    buildMealFromTemplate(findManualMeal("greek-yogurt-crunch"), 1),
     buildMealFromScanDraft(analyzeScanPreset("chicken-rice"), 1),
   ];
 }
@@ -211,18 +138,7 @@ export function suggestNextAction(remainingProtein) {
 }
 
 export function analyzeScanPreset(presetId) {
-  const preset = scanPresetCatalog[presetId] ?? scanPresetCatalog["power-thali"];
-  const items = preset.items.map((item) => ({ ...item }));
-
-  return {
-    id: preset.id,
-    title: preset.title,
-    caption: preset.caption,
-    confidence: preset.confidence,
-    disclaimer: "Estimates may vary",
-    items,
-    totals: sumMacros(items),
-  };
+  return createScanDraft(presetId);
 }
 
 function loadState() {
@@ -264,7 +180,7 @@ function saveState(state) {
 }
 
 function getManualTemplate(templateId) {
-  return manualMealCatalog.find((item) => item.id === templateId) ?? manualMealCatalog[0];
+  return findManualMeal(templateId);
 }
 
 function getManualPreview(uiState) {
@@ -310,10 +226,9 @@ function renderMealTimeline(meals) {
 }
 
 function renderManualOptions(uiState) {
-  const query = uiState.manualQuery.trim().toLowerCase();
+  const meals = searchManualMeals(uiState.manualQuery).flatMap((section) => section.items);
 
-  return manualMealCatalog
-    .filter((meal) => !query || meal.name.toLowerCase().includes(query) || meal.subtitle.toLowerCase().includes(query))
+  return meals
     .map(
       (meal) => `
         <button class="option-card ${meal.id === uiState.selectedManualId ? "is-active" : ""}" type="button" data-manual-option="${meal.id}">
@@ -327,7 +242,7 @@ function renderManualOptions(uiState) {
 }
 
 function renderScanPresetList(uiState) {
-  return Object.values(scanPresetCatalog)
+  return scanPresets
     .map(
       (preset) => `
         <button class="scan-card ${preset.id === uiState.selectedScanId ? "is-active" : ""}" type="button" data-scan-preset="${preset.id}">
@@ -437,11 +352,11 @@ function initializeApp() {
     manualOpen: false,
     scanOpen: false,
     manualQuery: "",
-    selectedManualId: manualMealCatalog[0].id,
+    selectedManualId: manualCatalog[0].id,
     manualMultiplier: 1,
-    selectedScanId: "power-thali",
+    selectedScanId: scanPresetIds[0],
     scanMultiplier: 1,
-    scanDraft: analyzeScanPreset("power-thali"),
+    scanDraft: analyzeScanPreset(scanPresetIds[0]),
   };
 
   document.querySelectorAll("[data-goal]").forEach((button) => {
