@@ -1,3 +1,14 @@
+import {
+  calculateProteinGoal,
+  calculateCalorieTarget,
+  normalizeCalorieGoal,
+} from "./src/logic/targets.js";
+import {
+  summarizeDay,
+  filterMealsByDay,
+  formatDayKey,
+} from "./src/logic/day-log.js";
+
 const manualMealCatalog = [
   {
     id: "paneer-power-bowl",
@@ -163,27 +174,11 @@ function buildMealFromScanDraft(scanDraft, multiplier = 1) {
   });
 }
 
-export function calculateProteinGoal({ weightKg, goalType, activityLevel }) {
-  const multipliers = {
-    lose: 1.8,
-    maintain: 2.0,
-    gain: 2.2,
-  };
-  const activityBonus = {
-    light: 0,
-    active: 0,
-    intense: 0.2,
-  };
-  const multiplier = (multipliers[goalType] ?? 2.0) + (activityBonus[activityLevel] ?? 0);
-  const target = round(weightKg * multiplier);
-  const lower = round(weightKg * Math.max(multiplier - 0.2, 1.6));
-  const upper = round(weightKg * (multiplier + 0.2));
-
-  return {
-    target,
-    rangeLabel: `${lower}-${upper}g protein/day`,
-  };
-}
+export {
+  calculateProteinGoal,
+  calculateCalorieTarget,
+  normalizeCalorieGoal,
+} from "./src/logic/targets.js";
 
 export function buildSeedMeals() {
   return [
@@ -193,19 +188,11 @@ export function buildSeedMeals() {
   ];
 }
 
-export function summarizeDay({ proteinGoal, calorieGoal, meals }) {
-  const consumedProtein = meals.reduce((sum, meal) => sum + meal.protein, 0);
-  const consumedCalories = meals.reduce((sum, meal) => sum + meal.calories, 0);
-  const progressPercent = Math.min(100, round((consumedProtein / proteinGoal) * 100));
-
-  return {
-    consumedProtein,
-    consumedCalories,
-    remainingProtein: Math.max(proteinGoal - consumedProtein, 0),
-    remainingCalories: Math.max(calorieGoal - consumedCalories, 0),
-    progressPercent,
-  };
-}
+export {
+  summarizeDay,
+  filterMealsByDay,
+  formatDayKey,
+} from "./src/logic/day-log.js";
 
 export function suggestNextAction(remainingProtein) {
   if (remainingProtein <= 0) {

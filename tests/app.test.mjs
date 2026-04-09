@@ -8,6 +8,14 @@ import {
   summarizeDay,
   suggestNextAction,
 } from "../app.js";
+import {
+  calculateCalorieTarget,
+  normalizeCalorieGoal,
+} from "../src/logic/targets.js";
+import {
+  filterMealsByDay,
+  formatDayKey,
+} from "../src/logic/day-log.js";
 
 test("calculateProteinGoal recommends a higher target for muscle gain", () => {
   const result = calculateProteinGoal({
@@ -59,6 +67,13 @@ test("index.html includes Cult brand treatment and illustration hooks", async ()
 
   assert.match(html, /aria-label="Cult brand"/);
   assert.match(html, /aurora-illustration/);
+  assert.doesNotMatch(html, /Aurora design language/);
+});
+
+test("index.html does not include the old Aurora performance eyebrow", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+
+  assert.doesNotMatch(html, /Aurora Performance Nutrition/);
 });
 
 test("calculateProteinGoal supports intense training with a stronger target", () => {
@@ -89,4 +104,60 @@ test("analyzeScanPreset returns editable beta scan data", () => {
   assert.equal(result.items[0].name, "Paneer tikka");
   assert.equal(result.totals.protein, 46);
   assert.equal(result.disclaimer, "Estimates may vary");
+});
+
+test("calculateCalorieTarget returns maintenance and target calories when inputs are complete", () => {
+  const result = calculateCalorieTarget({
+    sex: "male",
+    age: 30,
+    heightCm: 178,
+    weightKg: 72,
+    activityLevel: "active",
+    goalType: "gain",
+  });
+
+  assert.deepEqual(result, {
+    maintenanceCalories: 2616,
+    targetCalories: 2866,
+    helperLabel: "2616 kcal maintain • 2866 kcal target",
+  });
+});
+
+test("normalizeCalorieGoal keeps blank input optional", () => {
+  assert.equal(normalizeCalorieGoal(""), null);
+  assert.equal(normalizeCalorieGoal("2050"), 2050);
+});
+
+test("summarizeDay leaves remaining calories blank when no calorie target is set", () => {
+  const summary = summarizeDay({
+    proteinGoal: 160,
+    calorieGoal: null,
+    meals: [
+      { protein: 40, calories: 420 },
+      { protein: 28, calories: 310 },
+    ],
+  });
+
+  assert.equal(summary.consumedProtein, 68);
+  assert.equal(summary.remainingProtein, 92);
+  assert.equal(summary.remainingCalories, null);
+  assert.equal(summary.calorieStatus, "Set calorie target");
+});
+
+test("filterMealsByDay isolates today and yesterday entries", () => {
+  const now = new Date("2026-04-09T09:00:00.000Z");
+  const meals = [
+    { id: "today", timestamp: "2026-04-09T06:00:00.000Z", protein: 24, calories: 220 },
+    { id: "yesterday", timestamp: "2026-04-08T19:00:00.000Z", protein: 35, calories: 380 },
+  ];
+
+  assert.deepEqual(
+    filterMealsByDay(meals, "today", now).map((meal) => meal.id),
+    ["today"],
+  );
+  assert.deepEqual(
+    filterMealsByDay(meals, "yesterday", now).map((meal) => meal.id),
+    ["yesterday"],
+  );
+  assert.equal(formatDayKey(now), "2026-04-09");
 });
