@@ -47,6 +47,7 @@ Success criteria:
 - Logo motion: continuous but restrained loop
 - Food coverage: mixed Indian and global
 - Manual logging: production-grade nutrition database target
+- Nutrition data strategy: Anuvaad INDB for Indian recipes plus USDA FoodData Central for broad search
 - Image scanning: real AI-assisted feature with editable, estimate-based results
 - Calculators: protein and calorie calculators in onboarding and later in Profile
 - Cult Transform: premium feature card linking out to `https://www.cult.fit/fitness/cult-transform`
@@ -437,6 +438,20 @@ That implies:
 
 In the product story, manual logging is the dependable path.
 
+The recommended source strategy should be:
+
+- Anuvaad INDB as the primary Indian recipe layer for cooked Indian dishes and common regional meals
+- USDA FoodData Central as the broad ingredient and search backbone for global foods, single ingredients, and packaged-style lookups
+- a product-owned meal layer for recents, saved meals, branded shortcuts, and portion presets
+- Kaggle Indian food nutrition exports only as optional bootstrap seed data or offline prototype fallback, not as the long-term source of truth
+
+Implementation should treat Anuvaad INDB and USDA as complementary:
+
+- Anuvaad improves Indian dish realism and serving-based logging
+- USDA improves breadth, structured search, and global food coverage
+
+Before production launch, the team should confirm commercial reuse and attribution requirements for Anuvaad INDB and any derivative datasets. If that review blocks production usage, the fallback should be USDA plus an internally curated Indian recipe layer until permission is resolved.
+
 ### 11.2 Image Scan Logging
 
 Image scanning should be a real AI-assisted feature in this phase.
@@ -617,7 +632,6 @@ The implementation plan should include:
 
 These decisions should be left open for implementation planning rather than blocking the spec:
 
-- exact nutrition data provider
 - exact model/provider for image-based food detection
 - image storage backend choice
 - analytics stack details
