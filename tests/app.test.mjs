@@ -216,17 +216,15 @@ test("index.html contains the animated Cult Fuel Log logo shell", async () => {
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 
   assert.match(html, /id="cult-fuel-logo"/);
-  assert.match(html, /class="brand-symbol"/);
+  assert.match(html, /class="brand-logo-image"/);
   assert.match(html, /FUEL LOG/);
 });
 
-test("index.html uses the provided Cult symbol with CULT-only lockup text", async () => {
+test("index.html uses Cult's public header logo asset in the brand lockup", async () => {
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 
-  assert.match(html, /brand-symbol-svg/);
-  assert.match(html, />CULT</);
-  assert.match(html, />FUEL LOG</);
-  assert.doesNotMatch(html, /vman-and-white-cult-text/);
+  assert.match(html, /vman-and-white-cult-text/);
+  assert.doesNotMatch(html, /brand-symbol-svg/);
 });
 
 test("index.html includes profile recalculation and Cult Transform sections", async () => {
