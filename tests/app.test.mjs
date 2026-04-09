@@ -59,6 +59,7 @@ test("index.html includes Cult brand treatment and illustration hooks", async ()
 
   assert.match(html, /aria-label="Cult brand"/);
   assert.match(html, /aurora-illustration/);
+  assert.doesNotMatch(html, /Aurora design language/);
 });
 
 test("calculateProteinGoal supports intense training with a stronger target", () => {
