@@ -189,6 +189,20 @@ test("searchManualMeals filters by name and subtitle", () => {
   assert.ok(names.includes("Paneer Bhurji Roll"));
 });
 
+test("manualSections cover common Indian meals across regions", () => {
+  const titles = manualSections.map((section) => section.title);
+  const names = manualSections.flatMap((section) => section.items.map((item) => item.name));
+
+  assert.ok(titles.includes("North Indian staples"));
+  assert.ok(titles.includes("South Indian meals"));
+  assert.ok(titles.includes("West Indian meals"));
+  assert.ok(titles.includes("East Indian meals"));
+  assert.ok(names.includes("Poha"));
+  assert.ok(names.includes("Idli Sambar"));
+  assert.ok(names.includes("Rajma Chawal"));
+  assert.ok(names.includes("Misal Pav"));
+});
+
 test("createScanDraft returns an editable scan result with disclaimer copy", () => {
   const draft = createScanDraft(scanPresetIds[0]);
 
@@ -232,6 +246,16 @@ test("index.html includes Cult Personal Training support beside Cult Transform",
   assert.match(html, /https:\/\/support\.cult\.fit\/support\/solutions\/articles\/25000019211-how-to-book-a-personal-training-session-/);
 });
 
+test("index.html includes real scan upload controls and preview hooks", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+
+  assert.match(html, /Use camera/);
+  assert.match(html, /Upload from gallery/);
+  assert.match(html, /id="scan-file-input"/);
+  assert.match(html, /id="scan-image-preview"/);
+  assert.match(html, /id="scan-status-copy"/);
+});
+
 test("index.html includes mobile day chips and bottom nav targets", async () => {
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 
@@ -265,6 +289,14 @@ test("styles.css includes reduced motion handling for the animated logo", async 
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(css, /@keyframes vman-pulse/);
   assert.match(css, /@keyframes wordmark-shimmer/);
+});
+
+test("styles.css enables mobile swipe rails with scroll snap", async () => {
+  const css = await readFile(new URL("../styles.css", import.meta.url), "utf8");
+
+  assert.match(css, /scroll-snap-type: x mandatory/);
+  assert.match(css, /scroll-snap-align: start/);
+  assert.match(css, /\.swipe-rail/);
 });
 
 test("index.html exposes the optional calorie helper and profile recalculation CTA", async () => {
@@ -314,4 +346,22 @@ test("index.html makes the calculators and logging options explicit", async () =
   assert.match(html, /Calorie calculator/);
   assert.match(html, /Log from pre-defined list/);
   assert.match(html, /Option to scan/);
+});
+
+test("index.html includes swipe-rail hooks for profile, log meal, and support sections", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+
+  assert.match(html, /data-rail="profile"/);
+  assert.match(html, /data-rail="log-meal"/);
+  assert.match(html, /data-rail="support"/);
+  assert.match(html, /data-rail-dots="profile"/);
+  assert.match(html, /data-rail-dots="log-meal"/);
+  assert.match(html, /data-rail-dots="support"/);
+});
+
+test("package.json exposes a local dev server script for scan API work", async () => {
+  const pkg = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
+
+  assert.equal(pkg.type, "module");
+  assert.equal(pkg.scripts.dev, "node server.mjs");
 });

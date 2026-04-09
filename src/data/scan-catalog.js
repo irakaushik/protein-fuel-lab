@@ -49,6 +49,18 @@ const scanPresetMap = Object.fromEntries(scanPresets.map((preset) => [preset.id,
 
 export const scanPresetIds = scanPresets.map((preset) => preset.id);
 
+export function createEmptyScanDraft() {
+  return {
+    id: "scan-upload",
+    title: "Scanned meal",
+    caption: "Upload a meal image to estimate protein and calories",
+    confidence: "Awaiting image",
+    disclaimer: "Estimates may vary",
+    items: [],
+    totals: { protein: 0, calories: 0, carbs: 0, fats: 0 },
+  };
+}
+
 export function createScanDraft(presetId) {
   const preset = scanPresetMap[presetId] ?? scanPresetMap["power-thali"];
   const items = preset.items.map((item) => ({ ...item }));

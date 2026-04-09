@@ -15,8 +15,7 @@ import {
 } from "./src/data/manual-catalog.js";
 import {
   createScanDraft,
-  scanPresetIds,
-  scanPresets,
+  createEmptyScanDraft,
 } from "./src/data/scan-catalog.js";
 
 const STORAGE_KEY = "cult-fuel-log-state-v1";
@@ -67,7 +66,15 @@ function atUtc(baseDate, dayOffset, hour) {
   return value.toISOString();
 }
 
-function createMeal({ name, source, subtitle, items, totals, timestamp = new Date().toISOString() }) {
+function createMeal({
+  name,
+  source,
+  subtitle,
+  items,
+  totals,
+  timestamp = new Date().toISOString(),
+  imageUrl,
+}) {
   return {
     id: `${source}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     timestamp,
@@ -75,6 +82,7 @@ function createMeal({ name, source, subtitle, items, totals, timestamp = new Dat
     source,
     subtitle,
     items,
+    imageUrl,
     protein: totals.protein,
     calories: totals.calories,
     carbs: totals.carbs,
@@ -100,7 +108,7 @@ function buildMealFromTemplate(template, multiplier = 1, timestamp) {
   });
 }
 
-function buildMealFromScanDraft(scanDraft, multiplier = 1, timestamp) {
+function buildMealFromScanDraft(scanDraft, multiplier = 1, timestamp, imageUrl) {
   const scaledItems = scanDraft.items.map((item) => scaleMacros(item, multiplier));
   const totals = sumMacros(scaledItems);
 
@@ -110,6 +118,7 @@ function buildMealFromScanDraft(scanDraft, multiplier = 1, timestamp) {
     subtitle: `${scanDraft.confidence} • ${scanDraft.disclaimer}`,
     items: scaledItems,
     timestamp,
+    imageUrl,
     totals,
   });
 }
@@ -152,6 +161,65 @@ export function suggestNextAction(remainingProtein) {
 
 export function analyzeScanPreset(presetId) {
   return createScanDraft(presetId);
+}
+
+function getScanStatusCopy(uiState) {
+  if (uiState.scanStatus === "analyzing") {
+    return "Analyzing your meal image for likely foods, protein, and calories.";
+  }
+
+  if (uiState.scanStatus === "error") {
+    return uiState.scanError || "We could not analyze that image. Try another photo.";
+  }
+
+  if (uiState.scanStatus === "ready") {
+    return "Review the detected foods, adjust portions, then confirm the scan.";
+  }
+
+  return "Upload a meal image to analyze protein and calories.";
+}
+
+function setScanPreviewUrl(uiState, nextUrl) {
+  if (uiState.scanImagePreviewUrl?.startsWith("blob:")) {
+    URL.revokeObjectURL(uiState.scanImagePreviewUrl);
+  }
+
+  uiState.scanImagePreviewUrl = nextUrl;
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = typeof reader.result === "string" ? reader.result : "";
+      const [, base64 = ""] = result.split(",");
+      resolve(base64);
+    };
+    reader.onerror = () => reject(new Error("Could not read the selected image."));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function requestScanAnalysis({ imageBase64, mimeType, fileName }) {
+  const response = await fetch("/api/scan", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      imageBase64,
+      mimeType,
+      fileName,
+    }),
+  });
+
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(payload.error || "Scan analysis failed.");
+  }
+
+  return payload;
 }
 
 function hydrateMeals(meals) {
@@ -291,20 +359,11 @@ function renderManualOptions(uiState) {
     .join("");
 }
 
-function renderScanPresetList(uiState) {
-  return scanPresets
-    .map(
-      (preset) => `
-        <button class="scan-card ${preset.id === uiState.selectedScanId ? "is-active" : ""}" type="button" data-scan-preset="${preset.id}">
-          <span class="scan-card-title">${preset.title}</span>
-          <span class="scan-card-copy">${preset.caption}</span>
-        </button>
-      `,
-    )
-    .join("");
-}
-
 function renderScanItemsEditor(uiState) {
+  if (!uiState.scanDraft.items.length) {
+    return `<p class="scan-empty-editor">Detected foods will appear here after analysis.</p>`;
+  }
+
   return uiState.scanDraft.items
     .map(
       (item, index) => `
@@ -315,6 +374,84 @@ function renderScanItemsEditor(uiState) {
       `,
     )
     .join("");
+}
+
+function renderRailDots(uiState) {
+  Object.entries(uiState.railIndex).forEach(([railName, activeIndex]) => {
+    const rail = document.querySelector(`[data-rail="${railName}"]`);
+    const dotHost = document.querySelector(`[data-rail-dots="${railName}"]`);
+    if (!rail || !dotHost) {
+      return;
+    }
+
+    const total = rail.children.length;
+    dotHost.innerHTML = Array.from({ length: total }, (_, index) => `
+      <button
+        class="rail-dot ${index === activeIndex ? "is-active" : ""}"
+        type="button"
+        aria-label="Go to card ${index + 1}"
+        data-rail-dot="${index}"
+      ></button>
+    `).join("");
+  });
+}
+
+function getActiveRailIndex(rail) {
+  const cards = Array.from(rail.children);
+  if (!cards.length) {
+    return 0;
+  }
+
+  const railRect = rail.getBoundingClientRect();
+  const viewportCenter = railRect.left + (rail.clientWidth / 2);
+  let bestIndex = 0;
+  let bestDistance = Number.POSITIVE_INFINITY;
+
+  cards.forEach((card, index) => {
+    const cardRect = card.getBoundingClientRect();
+    const distance = Math.abs((cardRect.left + (cardRect.width / 2)) - viewportCenter);
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      bestIndex = index;
+    }
+  });
+
+  return bestIndex;
+}
+
+function bindSwipeRails(uiState) {
+  ["profile", "log-meal", "support"].forEach((railName) => {
+    const rail = document.querySelector(`[data-rail="${railName}"]`);
+    const dotHost = document.querySelector(`[data-rail-dots="${railName}"]`);
+    if (!rail || !dotHost) {
+      return;
+    }
+
+    let frameId = 0;
+    rail.addEventListener("scroll", () => {
+      window.cancelAnimationFrame(frameId);
+      frameId = window.requestAnimationFrame(() => {
+        uiState.railIndex[railName] = getActiveRailIndex(rail);
+        renderRailDots(uiState);
+      });
+    });
+
+    dotHost.addEventListener("click", (event) => {
+      const dot = event.target.closest("[data-rail-dot]");
+      if (!dot) {
+        return;
+      }
+
+      const index = Number(dot.dataset.railDot);
+      rail.children[index]?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "start",
+      });
+      uiState.railIndex[railName] = index;
+      renderRailDots(uiState);
+    });
+  });
 }
 
 function setActivePills(profile, uiState) {
@@ -450,6 +587,7 @@ function renderApp(state, uiState) {
     ?? "We will calculate this if you know your basics.";
   document.querySelector("#image-storage").checked = state.profile.storeMealImages;
   setActivePills(state.profile, uiState);
+  renderRailDots(uiState);
 
   document.querySelector("#manual-sheet").classList.toggle("is-open", uiState.manualOpen);
   document.querySelector("#scan-sheet").classList.toggle("is-open", uiState.scanOpen);
@@ -464,9 +602,14 @@ function renderApp(state, uiState) {
   document.querySelector("#manual-preview-carbs").textContent = `${manualPreview.carbs}g`;
   document.querySelector("#manual-preview-fats").textContent = `${manualPreview.fats}g`;
 
-  document.querySelector("#scan-preset-list").innerHTML = renderScanPresetList(uiState);
   document.querySelector("#scan-portion").value = String(uiState.scanMultiplier);
   document.querySelector("#scan-portion-label").textContent = `${uiState.scanMultiplier.toFixed(1)}x plate`;
+  document.querySelector("#scan-image-shell").classList.toggle("has-image", Boolean(uiState.scanImagePreviewUrl));
+  document.querySelector("#scan-image-preview").src = uiState.scanImagePreviewUrl || "";
+  document.querySelector("#scan-image-preview").alt = uiState.scanImageName
+    ? `${uiState.scanImageName} preview`
+    : "Selected meal preview";
+  document.querySelector("#scan-status-copy").textContent = getScanStatusCopy(uiState);
   document.querySelector("#scan-confidence").textContent = scanPreview.confidence;
   document.querySelector("#scan-caption").textContent = scanPreview.caption;
   document.querySelector("#scan-disclaimer").textContent = scanPreview.disclaimer;
@@ -475,6 +618,30 @@ function renderApp(state, uiState) {
   document.querySelector("#scan-preview-calories").textContent = `${scanPreview.totals.calories}`;
   document.querySelector("#scan-preview-carbs").textContent = `${scanPreview.totals.carbs}g`;
   document.querySelector("#scan-preview-fats").textContent = `${scanPreview.totals.fats}g`;
+  document.querySelector("#save-scan-meal").disabled = !(uiState.scanStatus === "ready" && scanPreview.items.length);
+  document.querySelector("#save-scan-meal").textContent = uiState.scanStatus === "analyzing"
+    ? "Analyzing..."
+    : "Confirm scan";
+}
+
+function resetScanState(uiState) {
+  uiState.scanMultiplier = 1;
+  uiState.scanStatus = "idle";
+  uiState.scanError = "";
+  uiState.scanImageName = "";
+  setScanPreviewUrl(uiState, "");
+  uiState.scanDraft = createEmptyScanDraft();
+}
+
+function triggerScanInput(mode) {
+  const input = document.querySelector("#scan-file-input");
+  if (mode === "camera") {
+    input.setAttribute("capture", "environment");
+  } else {
+    input.removeAttribute("capture");
+  }
+
+  input.click();
 }
 
 function initializeApp() {
@@ -487,9 +654,17 @@ function initializeApp() {
     manualQuery: "",
     selectedManualId: manualCatalog[0].id,
     manualMultiplier: 1,
-    selectedScanId: scanPresetIds[0],
     scanMultiplier: 1,
-    scanDraft: analyzeScanPreset(scanPresetIds[0]),
+    scanDraft: createEmptyScanDraft(),
+    scanStatus: "idle",
+    scanError: "",
+    scanImagePreviewUrl: "",
+    scanImageName: "",
+    railIndex: {
+      profile: 0,
+      "log-meal": 0,
+      support: 0,
+    },
   };
 
   const updateProteinRecommendation = () => {
@@ -658,16 +833,48 @@ function initializeApp() {
     showToast(`${template.name} added to today`);
   });
 
-  document.querySelector("#scan-preset-list").addEventListener("click", (event) => {
-    const option = event.target.closest("[data-scan-preset]");
-    if (!option) {
+  document.querySelector("#open-camera-scan").addEventListener("click", () => {
+    triggerScanInput("camera");
+  });
+
+  document.querySelector("#open-gallery-scan").addEventListener("click", () => {
+    triggerScanInput("gallery");
+  });
+
+  document.querySelector("#scan-file-input").addEventListener("change", async (event) => {
+    const [file] = Array.from(event.target.files ?? []);
+    if (!file) {
       return;
     }
 
-    uiState.selectedScanId = option.dataset.scanPreset;
-    uiState.scanDraft = analyzeScanPreset(uiState.selectedScanId);
-    uiState.scanMultiplier = 1;
+    uiState.scanStatus = "analyzing";
+    uiState.scanError = "";
+    uiState.scanImageName = file.name || "Meal image";
+    setScanPreviewUrl(uiState, URL.createObjectURL(file));
+    uiState.scanDraft = createEmptyScanDraft();
     renderApp(state, uiState);
+
+    try {
+      const imageBase64 = await fileToBase64(file);
+      const scanResult = await requestScanAnalysis({
+        imageBase64,
+        mimeType: file.type || "image/jpeg",
+        fileName: file.name,
+      });
+
+      uiState.scanDraft = scanResult;
+      uiState.scanStatus = "ready";
+      renderApp(state, uiState);
+      showToast("Meal analysis ready");
+    } catch (error) {
+      uiState.scanStatus = "error";
+      uiState.scanError = error.message || "We could not analyze that image.";
+      uiState.scanDraft = createEmptyScanDraft();
+      renderApp(state, uiState);
+      showToast("Scan failed");
+    } finally {
+      event.target.value = "";
+    }
   });
 
   document.querySelector("#scan-portion").addEventListener("input", (event) => {
@@ -686,10 +893,18 @@ function initializeApp() {
   });
 
   document.querySelector("#save-scan-meal").addEventListener("click", () => {
-    state.meals.unshift(buildMealFromScanDraft(uiState.scanDraft, uiState.scanMultiplier));
+    if (uiState.scanStatus !== "ready" || !uiState.scanDraft.items.length) {
+      return;
+    }
+
+    state.meals.unshift(buildMealFromScanDraft(
+      uiState.scanDraft,
+      uiState.scanMultiplier,
+      undefined,
+    ));
     saveState(state);
     uiState.scanOpen = false;
-    uiState.scanMultiplier = 1;
+    resetScanState(uiState);
     renderApp(state, uiState);
     showToast("Scan saved to today");
   });
@@ -711,6 +926,7 @@ function initializeApp() {
     showToast(`${removed.name} removed`);
   });
 
+  bindSwipeRails(uiState);
   renderApp(state, uiState);
 }
 

@@ -42,7 +42,7 @@
           <p class="section-copy">Use the calculators to set your targets, keep calories optional, and update your profile any time.</p>
         </div>
 
-        <div class="profile-card-grid">
+        <div class="profile-card-grid swipe-rail" data-rail="profile">
           <article class="profile-tool profile-tool-protein">
             <div class="tool-heading">
               <div>
@@ -109,6 +109,7 @@
             <p class="recommendation secondary" id="recommended-calories">2616 kcal maintain • 2866 kcal target</p>
           </article>
         </div>
+        <div class="rail-dots" data-rail-dots="profile" aria-label="Profile cards"></div>
 
         <div class="profile-footer">
           <label class="toggle">
@@ -132,7 +133,7 @@
           <p class="section-copy">Both flows update today instantly, stay editable, and keep protein front and center.</p>
         </div>
 
-        <div class="action-grid">
+        <div class="action-grid swipe-rail" data-rail="log-meal">
           <button class="action-card action-card-scan" id="open-scan-log" type="button">
             <span class="action-card-tag">Option to scan</span>
             <strong>Scan meal</strong>
@@ -144,6 +145,7 @@
             <span>Frequent Indian and global meals with fast portion controls.</span>
           </button>
         </div>
+        <div class="rail-dots" data-rail-dots="log-meal" aria-label="Log meal cards"></div>
       </section>
 
       <section class="track-section" id="track-section">
@@ -221,7 +223,7 @@
           </div>
         </div>
 
-        <div class="support-card-grid">
+        <div class="support-card-grid swipe-rail" data-rail="support">
           <section class="transform-card glass-card">
             <p class="eyebrow">Continue with Cult</p>
             <h2>Cult Transform</h2>
@@ -246,6 +248,7 @@
             <a class="primary-action transform-link" href="https://support.cult.fit/support/solutions/articles/25000019211-how-to-book-a-personal-training-session-" target="_blank" rel="noreferrer">Open Personal Training</a>
           </section>
         </div>
+        <div class="rail-dots" data-rail-dots="support" aria-label="Support cards"></div>
       </section>
 
       <div class="sheet-backdrop" id="sheet-backdrop" hidden></div>
@@ -303,7 +306,21 @@
 
         <div class="sheet-grid">
           <div class="sheet-column">
-            <div class="scan-grid" id="scan-preset-list"></div>
+            <div class="scan-upload-actions">
+              <button class="secondary-action" id="open-camera-scan" type="button">Use camera</button>
+              <button class="secondary-action" id="open-gallery-scan" type="button">Upload from gallery</button>
+              <input id="scan-file-input" type="file" accept="image/*" hidden>
+            </div>
+
+            <div class="scan-image-shell" id="scan-image-shell">
+              <img class="scan-image-preview" id="scan-image-preview" alt="Selected meal preview">
+              <div class="scan-image-placeholder" id="scan-image-placeholder">
+                <strong>Upload a meal image</strong>
+                <span>Camera or gallery both work here.</span>
+              </div>
+            </div>
+
+            <p class="scan-status-copy" id="scan-status-copy">Upload a meal image to analyze protein and calories.</p>
 
             <label class="control-block" for="scan-portion">
               <span>Detected portion</span>
@@ -329,7 +346,7 @@
               </div>
             </div>
 
-            <button class="primary-action" id="save-scan-meal" type="button">Confirm scan</button>
+            <button class="primary-action" id="save-scan-meal" type="button" disabled>Confirm scan</button>
           </div>
         </div>
       </section>

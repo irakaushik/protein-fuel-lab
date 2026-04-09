@@ -488,6 +488,12 @@ input[type="range"] {
   box-shadow: 0 18px 32px rgba(88, 166, 255, 0.24);
 }
 
+.primary-action:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 .toggle {
   display: flex;
   align-items: center;
@@ -536,6 +542,14 @@ input[type="range"] {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
+}
+
+.swipe-rail {
+  position: relative;
+}
+
+.rail-dots {
+  display: none;
 }
 
 .action-card {
@@ -821,6 +835,69 @@ input[type="range"] {
     var(--surface-strong);
 }
 
+.scan-upload-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.scan-image-shell {
+  position: relative;
+  min-height: 13rem;
+  overflow: hidden;
+  border-radius: 1.2rem;
+  border: 1px solid var(--border);
+  background:
+    radial-gradient(circle at top left, rgba(88, 166, 255, 0.12), transparent 35%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02)),
+    rgba(255, 255, 255, 0.03);
+}
+
+.scan-image-shell.has-image {
+  background: rgba(5, 10, 17, 0.86);
+}
+
+.scan-image-preview {
+  display: none;
+  width: 100%;
+  min-height: 13rem;
+  max-height: 18rem;
+  object-fit: cover;
+}
+
+.scan-image-shell.has-image .scan-image-preview {
+  display: block;
+}
+
+.scan-image-placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 0.45rem;
+  padding: 1.25rem;
+  text-align: center;
+  color: var(--muted);
+}
+
+.scan-image-placeholder strong {
+  color: var(--text);
+}
+
+.scan-image-shell.has-image .scan-image-placeholder {
+  display: none;
+}
+
+.scan-status-copy {
+  margin: 0;
+  color: var(--muted);
+}
+
+.scan-empty-editor {
+  margin: 0;
+  color: var(--muted);
+}
+
 .sheet-backdrop {
   position: fixed;
   inset: 0;
@@ -1100,10 +1177,54 @@ input[type="range"] {
   .setup-card,
   .hero-card,
   .sheet-grid,
-  .profile-card-grid,
-  .support-card-grid,
   .summary-grid {
     grid-template-columns: 1fr;
+  }
+
+  .swipe-rail {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 88%;
+    gap: 0.9rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .swipe-rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .swipe-rail > * {
+    scroll-snap-align: start;
+  }
+
+  .profile-card-grid,
+  .action-grid,
+  .support-card-grid {
+    grid-template-columns: none;
+  }
+
+  .rail-dots {
+    display: flex;
+    gap: 0.45rem;
+    justify-content: center;
+    margin-top: 0.8rem;
+  }
+
+  .rail-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    border: 0;
+    background: rgba(255, 255, 255, 0.22);
+  }
+
+  .rail-dot.is-active {
+    width: 1.2rem;
+    background: linear-gradient(135deg, var(--blue), var(--yellow));
   }
 
   .hero-title {
@@ -1144,8 +1265,7 @@ input[type="range"] {
   }
 
   .inline-fields,
-  .preview-stats,
-  .action-grid {
+  .preview-stats {
     grid-template-columns: 1fr;
   }
 
@@ -1155,6 +1275,24 @@ input[type="range"] {
 
   .ring {
     width: 12rem;
+  }
+
+  .hero-card,
+  .profile-panel,
+  .log-section,
+  .transform-card,
+  .timeline-section,
+  .sheet {
+    padding: 1.1rem;
+  }
+
+  .scan-upload-actions {
+    flex-direction: column;
+  }
+
+  .scan-upload-actions .secondary-action,
+  .primary-action {
+    width: 100%;
   }
 }
 
