@@ -46,11 +46,15 @@ Success criteria:
 - Logo placement: compact icon beside `FUEL LOG`
 - Logo motion: continuous but restrained loop
 - Food coverage: mixed Indian and global
+- Manual meal coverage: broad common Indian meals across regions, not long-tail exhaustive regional depth
 - Manual logging: production-grade nutrition database target
 - Nutrition data strategy: Anuvaad INDB for Indian recipes plus USDA FoodData Central for broad search
 - Image scanning: real AI-assisted feature with editable, estimate-based results
+- Scan backend: backend/API required, with OpenAI Responses API and GPT-4o as the first image-analysis model
 - Calculators: protein and calorie calculators in onboarding and later in Profile
 - Cult Transform: premium feature card linking out to `https://www.cult.fit/fitness/cult-transform`
+- Cult Personal Training: secondary support card linking to Cult PT booking/help
+- Mobile interaction: mobile-only swipe rails for dense card groups, with desktop retaining grid layout
 
 ## 4. Experience Principles
 
@@ -99,6 +103,7 @@ Navigation model:
 - Day switching uses segmented chips: `Today`, `Yesterday`, `Calendar`
 - Logging tasks open as full-screen overlays or stacked mobile screens
 - After save, the user returns to `Today` and sees immediate progress updates
+- On mobile, dense card groups can become horizontal swipe rails with snap points while core tracking remains vertical
 
 ## 6. Core Screens
 
@@ -164,6 +169,7 @@ Required interaction model:
 - recent foods first
 - frequent meals second
 - search as the main full lookup method
+- common Indian meals across regions should be first-class suggestions, not a niche subsection
 - portion controls with serving and grams
 - macro preview before save
 - save to today with immediate dashboard update
@@ -178,7 +184,9 @@ Purpose:
 
 Required interaction model:
 
-- capture image or upload image
+- capture image from camera or upload image from gallery
+- show the selected image in the review flow
+- upload the image to a backend/API for meal analysis
 - return detected items
 - return estimated portions
 - return estimated protein, calories, carbs, and fats
@@ -245,6 +253,22 @@ Required content:
 
 This should feel like a curated product extension, not an advertisement pasted into the page.
 
+### 6.9 Cult Personal Training Feature Card
+
+Purpose:
+
+- provide a second premium support path for users who want trainer-led help beyond self-tracking
+
+Required content:
+
+- eyebrow: `PT Support`
+- title: `Cult Personal Training`
+- short supporting copy about 1:1 trainer support, guided sessions, and goal-led execution
+- 2 or 3 compact benefit points
+- primary CTA linking to Cult's PT booking/help destination
+
+This should live beside the Transform card inside the broader support section and feel like part of the same curated support system.
+
 ## 7. Key User Flows
 
 ### 7.1 Setup Flow
@@ -268,11 +292,12 @@ This should feel like a curated product extension, not an advertisement pasted i
 ### 7.3 Scan Logging Flow
 
 1. User taps `Scan meal`
-2. User captures or uploads image
-3. App returns detected items and macro estimates
-4. User edits if needed
-5. User confirms
-6. Dashboard updates immediately
+2. User chooses camera capture or gallery upload
+3. App previews the image and sends it to the backend/API
+4. Backend analyzes the image with an image model and returns detected items plus macro estimates
+5. User edits if needed
+6. User confirms
+7. Dashboard updates immediately
 
 ### 7.4 Daily Review Flow
 
@@ -327,7 +352,28 @@ It should not feel:
 - bodybuilding-heavy
 - generic wellness-app soft
 
-### 8.1 Animated Logo System
+### 8.1 Mobile Interaction Pattern
+
+The app should be meaningfully optimized for mobile rather than simply collapsing the desktop layout.
+
+On mobile:
+
+- `MY PROFILE` becomes a 2-card swipe rail
+- `LOG MEAL` becomes a 2-card swipe rail
+- `NUTRITION SUPPORT` becomes a 2-card swipe rail
+- `MY TRACK` remains vertically readable and immediately visible
+- swipe rails use horizontal scroll with snap points
+- one card should be mostly visible at a time with a slight next-card peek
+- subtle pagination dots should indicate position within each rail
+
+On desktop:
+
+- the current grid or side-by-side layout should remain
+- swipe interaction should not be required
+
+This creates a cleaner, more app-like mobile experience without hiding the primary tracking surface.
+
+### 8.2 Animated Logo System
 
 Logo structure:
 
@@ -364,6 +410,25 @@ Example foods and meals:
 
 - paneer bowl
 - dal chilla
+- poha
+- idli sambar
+- dosa
+- upma
+- chole bhature
+- rajma chawal
+- paneer bhurji
+- aloo paratha
+- khichdi
+- curd rice
+- lemon rice
+- veg pulao
+- chicken biryani
+- fish curry rice
+- roti sabzi
+- sambar rice
+- misal pav
+- pav bhaji
+- kathi roll
 - chicken curry rice
 - egg wrap
 - whey isolate
@@ -372,6 +437,16 @@ Example foods and meals:
 - grilled chicken sandwich
 
 Search, recents, and scan examples should include both Indian and global foods side by side.
+
+The manual catalog should prioritize the most common Indian meals across regions:
+
+- North Indian staples
+- South Indian breakfast and rice-based meals
+- West Indian street and comfort foods
+- East Indian home-style staples
+- high-frequency pan-Indian gym foods and cafe-style protein options
+
+The goal is broad practical coverage for the meals users log often, not a claim of exhaustive regional completeness.
 
 ## 10. Data Model
 
@@ -459,6 +534,8 @@ Image scanning should be a real AI-assisted feature in this phase.
 That implies:
 
 - real meal-image analysis instead of a purely fake prototype response
+- camera capture and gallery upload support in the client
+- backend/API mediation rather than direct browser-to-model calls
 - editable detected items
 - editable portion estimates
 - confidence communication
@@ -473,6 +550,20 @@ However, image scan should still be framed as estimate-based because:
 - Indian foods often involve layered or combined preparations
 
 Therefore the product must communicate that scan outputs are helpful estimates, not medical-grade nutritional facts.
+
+Recommended backend approach:
+
+- frontend uploads the image to an app-controlled backend
+- backend sends the image to OpenAI via the Responses API
+- GPT-4o should be the first model for meal-image analysis
+- backend returns a normalized response shape:
+  - detected items
+  - estimated macros
+  - confidence label
+  - disclaimer copy
+  - optional image URL/reference if storage is enabled
+
+Future optimization may route simpler scans through a smaller model, but the first implementation should prioritize quality over cost tuning.
 
 ### 11.3 Target Calculation Strategy
 
