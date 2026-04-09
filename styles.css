@@ -122,49 +122,14 @@ button {
 .topbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.8rem;
 }
 
 .brand-lockup {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.9rem;
-}
-
-.cult-brand {
-  display: inline-flex;
-  align-items: center;
-  width: fit-content;
-  padding: 0.28rem 0.38rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(0, 0, 0, 0.34);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
-}
-
-.cult-brand-chip,
-.cult-brand-fit {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2rem;
-  padding: 0.1rem 0.78rem;
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  border-radius: 999px;
-}
-
-.cult-brand-chip {
-  color: #05090e;
-  background: linear-gradient(135deg, #ffffff, #cfd8de);
-}
-
-.cult-brand-fit {
-  color: var(--text);
+  display: grid;
+  gap: 0.3rem;
 }
 
 .product-wordmark-title,
@@ -205,21 +170,12 @@ button {
   color: var(--yellow);
 }
 
-.topbar-chip,
 .history-chip,
 .nav-item,
 .pill-button,
 .toggle,
 .meal-label {
   color: var(--muted);
-}
-
-.topbar-chip {
-  margin: 0;
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
 }
 
 .setup-card,
@@ -859,13 +815,7 @@ input[type="search"],
   }
 
   .brand-lockup {
-    flex-direction: column;
-    align-items: flex-start;
     gap: 0.7rem;
-  }
-
-  .cult-brand {
-    align-self: flex-start;
   }
 
   .ring {
