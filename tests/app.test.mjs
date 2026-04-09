@@ -202,15 +202,17 @@ test("index.html contains the animated Cult Fuel Log logo shell", async () => {
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 
   assert.match(html, /id="cult-fuel-logo"/);
-  assert.match(html, /class="brand-logo-image"/);
+  assert.match(html, /class="brand-symbol"/);
   assert.match(html, /FUEL LOG/);
 });
 
-test("index.html uses Cult's public header logo asset in the brand lockup", async () => {
+test("index.html uses the provided Cult symbol with CULT-only lockup text", async () => {
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 
-  assert.match(html, /vman-and-white-cult-text/);
-  assert.doesNotMatch(html, /class="vman-mark"/);
+  assert.match(html, /brand-symbol-svg/);
+  assert.match(html, />CULT</);
+  assert.match(html, />FUEL LOG</);
+  assert.doesNotMatch(html, /vman-and-white-cult-text/);
 });
 
 test("index.html includes profile recalculation and Cult Transform sections", async () => {
@@ -220,6 +222,14 @@ test("index.html includes profile recalculation and Cult Transform sections", as
   assert.match(html, /Recalculate targets/);
   assert.match(html, /Cult Transform/);
   assert.match(html, /https:\/\/www\.cult\.fit\/fitness\/cult-transform/);
+});
+
+test("index.html includes Cult Personal Training support beside Cult Transform", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+
+  assert.match(html, /Cult Personal Training/);
+  assert.match(html, /1:1 trainer support/);
+  assert.match(html, /https:\/\/support\.cult\.fit\/support\/solutions\/articles\/25000019211-how-to-book-a-personal-training-session-/);
 });
 
 test("index.html includes mobile day chips and bottom nav targets", async () => {
