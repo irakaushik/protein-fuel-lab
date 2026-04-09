@@ -232,3 +232,20 @@ test("buildSeedMeals provides timestamped entries across today and yesterday", (
   assert.ok(dayKeys.includes("2026-04-09"));
   assert.ok(dayKeys.includes("2026-04-08"));
 });
+
+test("styles.css uses the approved black blue yellow white pink palette and drops orange", async () => {
+  const css = await readFile(new URL("../styles.css", import.meta.url), "utf8");
+
+  assert.match(css, /--blue:/);
+  assert.match(css, /--yellow:/);
+  assert.match(css, /--pink:/);
+  assert.doesNotMatch(css, /#ff8f32/i);
+});
+
+test("styles.css includes reduced motion handling for the animated logo", async () => {
+  const css = await readFile(new URL("../styles.css", import.meta.url), "utf8");
+
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
+  assert.match(css, /@keyframes vman-pulse/);
+  assert.match(css, /@keyframes wordmark-shimmer/);
+});
