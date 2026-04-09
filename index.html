@@ -117,11 +117,99 @@
         <div class="meal-timeline" id="meal-timeline"></div>
       </section>
 
+      <div class="sheet-backdrop" id="sheet-backdrop" hidden></div>
+
+      <section class="sheet" id="manual-sheet" aria-label="Manual meal logging">
+        <div class="sheet-header">
+          <div>
+            <p class="eyebrow">Manual log</p>
+            <h2>Search, adjust portion, and add fast.</h2>
+          </div>
+          <button class="sheet-close" data-close-sheet type="button">Close</button>
+        </div>
+
+        <div class="sheet-grid">
+          <div class="sheet-column">
+            <label class="control-block" for="manual-search">
+              <span>Recents and common meals</span>
+              <input id="manual-search" type="search" placeholder="Search protein foods">
+            </label>
+            <div class="manual-options" id="manual-options"></div>
+          </div>
+
+          <div class="sheet-column">
+            <label class="control-block" for="manual-portion">
+              <span>Portion</span>
+              <strong id="manual-portion-label">1.0x portion</strong>
+            </label>
+            <input id="manual-portion" type="range" min="0.5" max="1.5" step="0.1" value="1">
+
+            <div class="preview-card">
+              <p class="eyebrow">Macro preview</p>
+              <h3 id="manual-preview-name">Paneer Power Bowl</h3>
+              <p id="manual-preview-copy">Paneer, quinoa, greens, mint yogurt</p>
+              <div class="preview-stats">
+                <div><strong id="manual-preview-protein">42g</strong><span>protein</span></div>
+                <div><strong id="manual-preview-calories">460</strong><span>kcal</span></div>
+                <div><strong id="manual-preview-carbs">28g</strong><span>carbs</span></div>
+                <div><strong id="manual-preview-fats">18g</strong><span>fats</span></div>
+              </div>
+            </div>
+
+            <button class="primary-action" id="add-manual-meal" type="button">Add to today</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="sheet" id="scan-sheet" aria-label="Scan meal review">
+        <div class="sheet-header">
+          <div>
+            <p class="eyebrow">Scan meal beta</p>
+            <h2>AI-assisted meal estimates, fully editable before save.</h2>
+          </div>
+          <button class="sheet-close" data-close-sheet type="button">Close</button>
+        </div>
+
+        <div class="sheet-grid">
+          <div class="sheet-column">
+            <div class="scan-grid" id="scan-preset-list"></div>
+
+            <label class="control-block" for="scan-portion">
+              <span>Detected portion</span>
+              <strong id="scan-portion-label">1.0x plate</strong>
+            </label>
+            <input id="scan-portion" type="range" min="0.6" max="1.6" step="0.1" value="1">
+          </div>
+
+          <div class="sheet-column">
+            <div class="preview-card">
+              <div class="scan-meta">
+                <p class="confidence-pill" id="scan-confidence">High confidence</p>
+                <p id="scan-caption">Paneer tikka, dal, and jeera rice</p>
+              </div>
+              <div class="scan-items-editor" id="scan-items-editor"></div>
+              <p class="scan-disclaimer" id="scan-disclaimer">Estimates may vary</p>
+
+              <div class="preview-stats">
+                <div><strong id="scan-preview-protein">46g</strong><span>protein</span></div>
+                <div><strong id="scan-preview-calories">700</strong><span>kcal</span></div>
+                <div><strong id="scan-preview-carbs">70g</strong><span>carbs</span></div>
+                <div><strong id="scan-preview-fats">25g</strong><span>fats</span></div>
+              </div>
+            </div>
+
+            <button class="primary-action" id="save-scan-meal" type="button">Confirm scan</button>
+          </div>
+        </div>
+      </section>
+
       <nav class="bottom-nav" aria-label="Primary">
         <button class="nav-item is-active" type="button">Today</button>
         <button class="nav-item" type="button">History</button>
         <button class="nav-item" type="button">Profile</button>
       </nav>
+
+      <div class="save-toast" id="save-toast" aria-live="polite"></div>
     </main>
     <script type="module" src="./app.js"></script>
   </body>

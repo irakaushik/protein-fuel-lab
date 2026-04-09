@@ -34,6 +34,10 @@ body {
   background: transparent;
 }
 
+body.sheet-open {
+  overflow: hidden;
+}
+
 button,
 input {
   font: inherit;
@@ -191,6 +195,16 @@ input[type="range"] {
 }
 
 input[type="number"] {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+}
+
+input[type="search"],
+.scan-item input {
   width: 100%;
   padding: 0.9rem 1rem;
   border-radius: 1rem;
@@ -442,6 +456,205 @@ input[type="number"] {
   color: var(--muted);
 }
 
+.meal-side {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: end;
+}
+
+.danger-action,
+.sheet-close {
+  padding: 0.7rem 0.95rem;
+  border-radius: 999px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+}
+
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgba(3, 8, 14, 0.62);
+}
+
+.sheet-backdrop.is-visible {
+  display: block;
+}
+
+.sheet {
+  position: fixed;
+  left: 50%;
+  bottom: 1rem;
+  z-index: 30;
+  width: min(100% - 1.6rem, 1100px);
+  padding: 1.25rem;
+  border-radius: 1.75rem;
+  border: 1px solid var(--border);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
+    var(--surface-strong);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow);
+  transform: translate(-50%, 120%);
+  transition: transform 240ms ease;
+}
+
+.sheet.is-open {
+  transform: translate(-50%, 0);
+}
+
+.sheet-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.sheet-header h2 {
+  margin: 0.4rem 0 0;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.5rem;
+}
+
+.sheet-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.sheet-column {
+  display: grid;
+  gap: 1rem;
+}
+
+.manual-options,
+.scan-grid,
+.scan-items-editor {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.option-card,
+.scan-card {
+  display: grid;
+  gap: 0.25rem;
+  padding: 1rem;
+  text-align: left;
+  border-radius: 1.2rem;
+  color: var(--text);
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.option-card.is-active,
+.scan-card.is-active {
+  border-color: rgba(255, 199, 107, 0.45);
+  background:
+    radial-gradient(circle at top left, rgba(255, 143, 50, 0.14), transparent 40%),
+    rgba(255, 255, 255, 0.05);
+}
+
+.option-title,
+.scan-card-title {
+  font-weight: 800;
+}
+
+.option-copy,
+.option-meta,
+.scan-card-copy,
+.scan-disclaimer,
+.scan-meta p:last-child,
+.preview-card p:last-child,
+.preview-stats span,
+.save-toast {
+  color: var(--muted);
+}
+
+.preview-card {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+  border-radius: 1.4rem;
+  border: 1px solid var(--border);
+  background:
+    radial-gradient(circle at top left, rgba(67, 231, 197, 0.1), transparent 42%),
+    rgba(255, 255, 255, 0.04);
+}
+
+.preview-card h3 {
+  margin: 0;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.4rem;
+}
+
+.preview-card p {
+  margin: 0;
+}
+
+.preview-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.preview-stats div {
+  padding: 0.75rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.preview-stats strong {
+  display: block;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.1rem;
+}
+
+.preview-stats span {
+  font-size: 0.82rem;
+}
+
+.scan-meta {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.confidence-pill {
+  justify-self: start;
+  margin: 0;
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  color: #08131f;
+  background: linear-gradient(135deg, var(--teal), var(--lime));
+  font-weight: 800;
+}
+
+.scan-item {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.save-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 6.5rem;
+  z-index: 40;
+  padding: 0.9rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(7, 17, 26, 0.95);
+  transform: translate(-50%, 1rem);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.save-toast.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
 .bottom-nav {
   position: sticky;
   bottom: 1rem;
@@ -482,5 +695,21 @@ input[type="number"] {
   .meal-card {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .meal-side,
+  .sheet-header {
+    width: 100%;
+    justify-items: start;
+  }
+
+  .sheet {
+    width: calc(100% - 1rem);
+    bottom: 0.5rem;
+  }
+
+  .sheet-grid,
+  .preview-stats {
+    grid-template-columns: 1fr;
   }
 }

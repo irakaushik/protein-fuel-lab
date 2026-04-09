@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import {
+  analyzeScanPreset,
   calculateProteinGoal,
   buildSeedMeals,
   summarizeDay,
@@ -72,4 +73,13 @@ test("summarizeDay returns completion percentage", () => {
   });
 
   assert.equal(summary.progressPercent, 62);
+});
+
+test("analyzeScanPreset returns editable beta scan data", () => {
+  const result = analyzeScanPreset("power-thali");
+
+  assert.equal(result.confidence, "High confidence");
+  assert.equal(result.items[0].name, "Paneer tikka");
+  assert.equal(result.totals.protein, 46);
+  assert.equal(result.disclaimer, "Estimates may vary");
 });
