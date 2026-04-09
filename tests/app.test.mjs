@@ -62,6 +62,8 @@ test("index.html includes Cult brand treatment and illustration hooks", async ()
   assert.doesNotMatch(html, /Aurora design language/);
   assert.doesNotMatch(html, /circle cx="78" cy="90" r="46"/);
   assert.doesNotMatch(html, /circle cx="236" cy="76" r="58"/);
+  assert.doesNotMatch(html, /path d="M86 219c24-48 49-86 77-114 15-14 35-29 60-45"/);
+  assert.doesNotMatch(html, /circle cx="218" cy="94" r="18"/);
 });
 
 test("calculateProteinGoal supports intense training with a stronger target", () => {

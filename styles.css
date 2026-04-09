@@ -417,7 +417,7 @@ input[type="search"],
   inset: 50% auto auto 50%;
   width: min(100%, 24rem);
   transform: translate(-50%, -50%);
-  opacity: 0.9;
+  opacity: 0.72;
   animation: breathe 9s ease-in-out infinite;
 }
 
@@ -431,9 +431,10 @@ input[type="search"],
   background:
     radial-gradient(circle, rgba(6, 12, 20, 0.98) 56%, transparent 57%),
     conic-gradient(
-      var(--blue) 0 calc(var(--progress) * 0.68),
-      var(--yellow) calc(var(--progress) * 0.68) calc(var(--progress) * 0.94),
-      var(--pink) calc(var(--progress) * 0.94) var(--progress),
+      var(--blue) 0 calc(var(--progress) * 0.76),
+      var(--blue-soft) calc(var(--progress) * 0.76) calc(var(--progress) * 0.9),
+      var(--yellow) calc(var(--progress) * 0.9) calc(var(--progress) * 0.97),
+      var(--pink) calc(var(--progress) * 0.97) var(--progress),
       var(--ring-track) var(--progress) 100%
     );
   box-shadow:
