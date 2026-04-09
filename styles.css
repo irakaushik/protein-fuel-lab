@@ -262,6 +262,11 @@ button {
 .setup-illustration {
   max-width: 24rem;
   margin-top: 1.3rem;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(63, 124, 255, 0.12), transparent 24%),
+    radial-gradient(circle at 84% 16%, rgba(255, 216, 77, 0.08), transparent 20%),
+    linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.015)),
+    rgba(7, 12, 22, 0.88);
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
 }
 
