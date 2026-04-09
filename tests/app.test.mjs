@@ -5,6 +5,7 @@ import {
   analyzeScanPreset,
   calculateProteinGoal,
   buildSeedMeals,
+  resolvePrimaryNavSelection,
   summarizeDay,
   suggestNextAction,
 } from "../app.js";
@@ -52,6 +53,11 @@ test("index.html contains the primary product CTAs", async () => {
   assert.match(html, /Log meal/);
   assert.match(html, /Scan meal/);
   assert.match(html, /Today/);
+  assert.match(html, /data-nav="today"/);
+  assert.match(html, /data-nav="history"/);
+  assert.match(html, /data-nav="profile"/);
+  assert.match(html, /id="timeline-section"/);
+  assert.match(html, /id="setup-card"/);
 });
 
 test("index.html includes Cult brand treatment and illustration hooks", async () => {
@@ -100,4 +106,26 @@ test("analyzeScanPreset returns editable beta scan data", () => {
   assert.equal(result.items[0].name, "Paneer tikka");
   assert.equal(result.totals.protein, 46);
   assert.equal(result.disclaimer, "Estimates may vary");
+});
+
+test("resolvePrimaryNavSelection maps profile to the setup card and reopens onboarding", () => {
+  const result = resolvePrimaryNavSelection("profile");
+
+  assert.deepEqual(result, {
+    activeNav: "profile",
+    revealSetup: true,
+    scrollTarget: "#setup-card",
+    scrollToTop: false,
+  });
+});
+
+test("resolvePrimaryNavSelection maps history to the timeline section", () => {
+  const result = resolvePrimaryNavSelection("history");
+
+  assert.deepEqual(result, {
+    activeNav: "history",
+    revealSetup: false,
+    scrollTarget: "#timeline-section",
+    scrollToTop: false,
+  });
 });

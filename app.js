@@ -238,6 +238,33 @@ export function analyzeScanPreset(presetId) {
   };
 }
 
+export function resolvePrimaryNavSelection(navId) {
+  if (navId === "history") {
+    return {
+      activeNav: "history",
+      revealSetup: false,
+      scrollTarget: "#timeline-section",
+      scrollToTop: false,
+    };
+  }
+
+  if (navId === "profile") {
+    return {
+      activeNav: "profile",
+      revealSetup: true,
+      scrollTarget: "#setup-card",
+      scrollToTop: false,
+    };
+  }
+
+  return {
+    activeNav: "today",
+    revealSetup: false,
+    scrollTarget: "",
+    scrollToTop: true,
+  };
+}
+
 function loadState() {
   if (typeof localStorage === "undefined") {
     return {
@@ -375,6 +402,14 @@ function setActivePills(profile) {
   });
 }
 
+function setActivePrimaryNav(activeNav) {
+  document.querySelectorAll("[data-nav]").forEach((button) => {
+    const isActive = button.dataset.nav === activeNav;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-current", isActive ? "page" : "false");
+  });
+}
+
 function showToast(message) {
   const toast = document.querySelector("#save-toast");
   toast.textContent = message;
@@ -417,6 +452,7 @@ function renderApp(state, uiState) {
   document.querySelector("#calorie-goal").value = String(state.profile.calorieGoal);
   document.querySelector("#image-storage").checked = state.profile.storeMealImages;
   setActivePills(state.profile);
+  setActivePrimaryNav(uiState.activeNav);
 
   document.querySelector("#manual-sheet").classList.toggle("is-open", uiState.manualOpen);
   document.querySelector("#scan-sheet").classList.toggle("is-open", uiState.scanOpen);
@@ -447,6 +483,7 @@ function renderApp(state, uiState) {
 function initializeApp() {
   const state = loadState();
   const uiState = {
+    activeNav: "today",
     manualOpen: false,
     scanOpen: false,
     manualQuery: "",
@@ -605,6 +642,31 @@ function initializeApp() {
     saveState(state);
     renderApp(state, uiState);
     showToast(`${removed.name} removed`);
+  });
+
+  document.querySelector(".bottom-nav").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-nav]");
+    if (!button) {
+      return;
+    }
+
+    const nextNav = resolvePrimaryNavSelection(button.dataset.nav);
+    uiState.activeNav = nextNav.activeNav;
+
+    if (nextNav.revealSetup) {
+      state.profile.completedOnboarding = false;
+      saveState(state);
+    }
+
+    renderApp(state, uiState);
+
+    if (nextNav.scrollToTop) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    const target = document.querySelector(nextNav.scrollTarget);
+    target?.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
   renderApp(state, uiState);
