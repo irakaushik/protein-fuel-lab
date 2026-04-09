@@ -4,20 +4,124 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cult Fuel Log</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
-    <main>
-      <h1>Cult Fuel Log</h1>
-      <nav>
-        <button>Today</button>
-        <button>History</button>
-        <button>Profile</button>
-      </nav>
-      <section>
-        <button>Log meal</button>
-        <button>Scan meal</button>
+    <div class="page-glow page-glow-left"></div>
+    <div class="page-glow page-glow-right"></div>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="brand-kicker">cult.fit aurora concept</p>
+          <h1>Cult Fuel Log</h1>
+        </div>
+        <p class="topbar-chip">Protein-first tracker</p>
+      </header>
+
+      <section class="setup-card" id="setup-card">
+        <div class="setup-copy">
+          <p class="eyebrow">Set your daily target</p>
+          <h2>Build your fuel profile in under 20 seconds.</h2>
+          <p>We recommend a protein target from your weight, goal, and training load, then keep it editable.</p>
+        </div>
+
+        <div class="setup-controls">
+          <label class="control-block" for="weight-input">
+            <span>Weight</span>
+            <strong id="weight-label">72 kg</strong>
+          </label>
+          <input id="weight-input" type="range" min="45" max="120" value="72">
+
+          <div class="pill-group">
+            <button class="pill-button" data-goal="lose" type="button">Lose</button>
+            <button class="pill-button is-active" data-goal="gain" type="button">Gain</button>
+            <button class="pill-button" data-goal="maintain" type="button">Maintain</button>
+          </div>
+
+          <div class="pill-group">
+            <button class="pill-button" data-activity="light" type="button">Light</button>
+            <button class="pill-button is-active" data-activity="active" type="button">Active</button>
+            <button class="pill-button" data-activity="intense" type="button">Intense</button>
+          </div>
+
+          <label class="control-block" for="calorie-goal">
+            <span>Calorie target</span>
+            <input id="calorie-goal" type="number" min="1200" step="50" value="2200">
+          </label>
+
+          <label class="toggle">
+            <input id="image-storage" type="checkbox" checked>
+            <span>Store meal images for history</span>
+          </label>
+
+          <p class="recommendation" id="recommended-goal">158g/day recommended</p>
+
+          <div class="setup-actions">
+            <button id="apply-profile" class="primary-action" type="button">Use target</button>
+            <button id="skip-setup" class="secondary-action" type="button">Skip for now</button>
+          </div>
+        </div>
       </section>
+
+      <section class="hero-card">
+        <div class="hero-copy">
+          <p class="eyebrow">Aurora Performance Nutrition</p>
+          <h2 class="hero-title">Today’s protein progress stays in front of every decision.</h2>
+          <p class="hero-subtitle">Fast manual logging, AI-assisted meal scan, and one dashboard that tells you exactly what to eat next.</p>
+          <div class="cta-row">
+            <button class="primary-action" id="open-manual-log" type="button">Log meal</button>
+            <button class="secondary-action" id="open-scan-log" type="button">Scan meal</button>
+          </div>
+        </div>
+
+        <div class="hero-meter">
+          <div class="ring" id="protein-ring">
+            <div class="ring-core">
+              <span id="progress-percent">62%</span>
+              <small>complete</small>
+            </div>
+          </div>
+          <p class="protein-value" id="consumed-protein">112g</p>
+          <p class="protein-goal" id="protein-goal">158g goal</p>
+        </div>
+      </section>
+
+      <section class="summary-grid">
+        <article class="glass-card emphasis">
+          <p class="stat-label">Remaining protein</p>
+          <h3 id="remaining-protein">46g left today</h3>
+          <p id="next-action">46g left today. Split it between a chicken rice bowl and an evening shake.</p>
+        </article>
+        <article class="glass-card">
+          <p class="stat-label">Calories</p>
+          <h3 id="remaining-calories">870 kcal remaining</h3>
+          <p>Calories stay visible, but protein always leads the page.</p>
+        </article>
+      </section>
+
+      <section class="timeline-section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Today</p>
+            <h2>Meal timeline</h2>
+          </div>
+          <div class="history-chip-row">
+            <button class="history-chip is-active" type="button">Today</button>
+            <button class="history-chip" type="button">Yesterday</button>
+            <button class="history-chip" type="button">Calendar</button>
+          </div>
+        </div>
+        <div class="meal-timeline" id="meal-timeline"></div>
+      </section>
+
+      <nav class="bottom-nav" aria-label="Primary">
+        <button class="nav-item is-active" type="button">Today</button>
+        <button class="nav-item" type="button">History</button>
+        <button class="nav-item" type="button">Profile</button>
+      </nav>
     </main>
     <script type="module" src="./app.js"></script>
   </body>

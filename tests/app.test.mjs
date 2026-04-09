@@ -52,3 +52,24 @@ test("index.html contains the primary product CTAs", async () => {
   assert.match(html, /Scan meal/);
   assert.match(html, /Today/);
 });
+
+test("calculateProteinGoal supports intense training with a stronger target", () => {
+  const result = calculateProteinGoal({
+    weightKg: 80,
+    goalType: "maintain",
+    activityLevel: "intense",
+  });
+
+  assert.equal(result.target, 176);
+  assert.match(result.rangeLabel, /160-192g/);
+});
+
+test("summarizeDay returns completion percentage", () => {
+  const summary = summarizeDay({
+    proteinGoal: 180,
+    calorieGoal: 2400,
+    meals: buildSeedMeals(),
+  });
+
+  assert.equal(summary.progressPercent, 62);
+});
