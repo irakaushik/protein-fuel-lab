@@ -223,3 +223,12 @@ test("index.html includes mobile day chips and bottom nav targets", async () => 
   assert.match(html, /data-nav-target="history"/);
   assert.match(html, /data-nav-target="profile"/);
 });
+
+test("buildSeedMeals provides timestamped entries across today and yesterday", () => {
+  const now = new Date("2026-04-09T12:00:00.000Z");
+  const meals = buildSeedMeals(now);
+  const dayKeys = meals.map((meal) => formatDayKey(new Date(meal.timestamp)));
+
+  assert.ok(dayKeys.includes("2026-04-09"));
+  assert.ok(dayKeys.includes("2026-04-08"));
+});

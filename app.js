@@ -23,10 +23,13 @@ const STORAGE_KEY = "cult-fuel-log-state-v1";
 
 const defaultProfile = {
   weightKg: 72,
+  heightCm: 178,
+  age: 30,
+  sex: "male",
   goalType: "gain",
   activityLevel: "active",
   proteinGoal: 158,
-  calorieGoal: 2200,
+  calorieGoal: null,
   storeMealImages: true,
   completedOnboarding: false,
 };
@@ -57,9 +60,17 @@ function sumMacros(items) {
   );
 }
 
-function createMeal({ name, source, subtitle, items, totals }) {
+function atUtc(baseDate, dayOffset, hour) {
+  const value = new Date(baseDate);
+  value.setUTCDate(value.getUTCDate() + dayOffset);
+  value.setUTCHours(hour, 0, 0, 0);
+  return value.toISOString();
+}
+
+function createMeal({ name, source, subtitle, items, totals, timestamp = new Date().toISOString() }) {
   return {
     id: `${source}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    timestamp,
     name,
     source,
     subtitle,
@@ -71,7 +82,7 @@ function createMeal({ name, source, subtitle, items, totals }) {
   };
 }
 
-function buildMealFromTemplate(template, multiplier = 1) {
+function buildMealFromTemplate(template, multiplier = 1, timestamp) {
   const scaled = scaleMacros(template, multiplier);
 
   return createMeal({
@@ -79,6 +90,7 @@ function buildMealFromTemplate(template, multiplier = 1) {
     source: "manual",
     subtitle: template.subtitle,
     items: [],
+    timestamp,
     totals: {
       protein: scaled.protein,
       calories: scaled.calories,
@@ -88,7 +100,7 @@ function buildMealFromTemplate(template, multiplier = 1) {
   });
 }
 
-function buildMealFromScanDraft(scanDraft, multiplier = 1) {
+function buildMealFromScanDraft(scanDraft, multiplier = 1, timestamp) {
   const scaledItems = scanDraft.items.map((item) => scaleMacros(item, multiplier));
   const totals = sumMacros(scaledItems);
 
@@ -97,6 +109,7 @@ function buildMealFromScanDraft(scanDraft, multiplier = 1) {
     source: "scan",
     subtitle: `${scanDraft.confidence} • ${scanDraft.disclaimer}`,
     items: scaledItems,
+    timestamp,
     totals,
   });
 }
@@ -107,11 +120,11 @@ export {
   normalizeCalorieGoal,
 } from "./src/logic/targets.js";
 
-export function buildSeedMeals() {
+export function buildSeedMeals(now = new Date()) {
   return [
-    buildMealFromTemplate(findManualMeal("paneer-power-bowl"), 1),
-    buildMealFromTemplate(findManualMeal("greek-yogurt-crunch"), 1),
-    buildMealFromScanDraft(analyzeScanPreset("chicken-rice"), 1),
+    buildMealFromTemplate(findManualMeal("paneer-power-bowl"), 1, atUtc(now, 0, 8)),
+    buildMealFromTemplate(findManualMeal("greek-yogurt-crunch"), 1, atUtc(now, 0, 13)),
+    buildMealFromScanDraft(analyzeScanPreset("chicken-rice"), 1, atUtc(now, -1, 19)),
   ];
 }
 
@@ -141,6 +154,19 @@ export function analyzeScanPreset(presetId) {
   return createScanDraft(presetId);
 }
 
+function hydrateMeals(meals) {
+  const fallbackTimes = [
+    atUtc(new Date(), 0, 8),
+    atUtc(new Date(), 0, 13),
+    atUtc(new Date(), -1, 19),
+  ];
+
+  return meals.map((meal, index) => ({
+    ...meal,
+    timestamp: meal.timestamp ?? fallbackTimes[index % fallbackTimes.length],
+  }));
+}
+
 function loadState() {
   if (typeof localStorage === "undefined") {
     return {
@@ -161,7 +187,7 @@ function loadState() {
     const parsed = JSON.parse(saved);
     return {
       profile: { ...defaultProfile, ...parsed.profile },
-      meals: Array.isArray(parsed.meals) && parsed.meals.length ? parsed.meals : buildSeedMeals(),
+      meals: Array.isArray(parsed.meals) && parsed.meals.length ? hydrateMeals(parsed.meals) : buildSeedMeals(),
     };
   } catch {
     return {
@@ -202,9 +228,21 @@ function getScanPreview(uiState) {
 }
 
 function renderMealTimeline(meals) {
+  if (!meals.length) {
+    return `
+      <article class="meal-card empty-state">
+        <div class="meal-copy">
+          <p class="meal-label">No meals yet</p>
+          <h3>Start with a manual log or a quick scan.</h3>
+          <p>Your protein progress will update here as soon as you add a meal.</p>
+        </div>
+      </article>
+    `;
+  }
+
   return meals
     .map(
-      (meal, index) => `
+      (meal) => `
         <article class="meal-card">
           <div class="meal-copy">
             <p class="meal-label">${meal.source === "scan" ? "Scan beta" : "Manual log"}</p>
@@ -217,7 +255,7 @@ function renderMealTimeline(meals) {
               <span>${meal.protein}g</span>
               <small>protein</small>
             </div>
-            <button class="danger-action" type="button" data-delete-meal="${index}">Delete</button>
+            <button class="danger-action" type="button" data-delete-meal-id="${meal.id}">Delete</button>
           </div>
         </article>
       `,
@@ -226,18 +264,30 @@ function renderMealTimeline(meals) {
 }
 
 function renderManualOptions(uiState) {
-  const meals = searchManualMeals(uiState.manualQuery).flatMap((section) => section.items);
+  const sections = searchManualMeals(uiState.manualQuery);
 
-  return meals
-    .map(
-      (meal) => `
-        <button class="option-card ${meal.id === uiState.selectedManualId ? "is-active" : ""}" type="button" data-manual-option="${meal.id}">
-          <span class="option-title">${meal.name}</span>
-          <span class="option-copy">${meal.subtitle}</span>
-          <span class="option-meta">${meal.protein}g protein • ${meal.calories} kcal</span>
-        </button>
-      `,
-    )
+  if (!sections.length) {
+    return `
+      <div class="empty-state">
+        <h3>No direct matches</h3>
+        <p>Try a simpler search or add a custom food next.</p>
+      </div>
+    `;
+  }
+
+  return sections
+    .map((section) => `
+      <section class="option-group">
+        <p class="option-group-title">${section.title}</p>
+        ${section.items.map((meal) => `
+          <button class="option-card ${meal.id === uiState.selectedManualId ? "is-active" : ""}" type="button" data-manual-option="${meal.id}">
+            <span class="option-title">${meal.name}</span>
+            <span class="option-copy">${meal.subtitle}</span>
+            <span class="option-meta">${meal.protein}g protein • ${meal.calories} kcal • ${meal.source.toUpperCase()}</span>
+          </button>
+        `).join("")}
+      </section>
+    `)
     .join("");
 }
 
@@ -267,7 +317,7 @@ function renderScanItemsEditor(uiState) {
     .join("");
 }
 
-function setActivePills(profile) {
+function setActivePills(profile, uiState) {
   document.querySelectorAll("[data-goal]").forEach((button) => {
     button.classList.toggle("is-active", button.dataset.goal === profile.goalType);
   });
@@ -275,6 +325,75 @@ function setActivePills(profile) {
   document.querySelectorAll("[data-activity]").forEach((button) => {
     button.classList.toggle("is-active", button.dataset.activity === profile.activityLevel);
   });
+
+  document.querySelectorAll("[data-sex]").forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.sex === profile.sex);
+  });
+
+  document.querySelectorAll("[data-day-key]").forEach((button) => {
+    const isCustomDay = !["today", "yesterday"].includes(uiState.dayKey);
+    const matches = button.dataset.dayKey === uiState.dayKey
+      || (button.dataset.dayKey === "calendar" && isCustomDay);
+    button.classList.toggle("is-active", matches);
+  });
+
+  document.querySelectorAll("[data-nav-target]").forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.navTarget === uiState.activeNav);
+  });
+}
+
+function getDayHeading(dayKey) {
+  if (dayKey === "today") {
+    return "Today";
+  }
+
+  if (dayKey === "yesterday") {
+    return "Yesterday";
+  }
+
+  const date = new Date(`${dayKey}T00:00:00`);
+  return date.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+  });
+}
+
+function getCalorieRecommendation(profile) {
+  return calculateCalorieTarget(profile);
+}
+
+function applyRecommendedTargets(profile, { forceCalorie = false } = {}) {
+  const proteinRecommendation = calculateProteinGoal(profile);
+  const calorieRecommendation = getCalorieRecommendation(profile);
+
+  profile.proteinGoal = proteinRecommendation.target;
+  if (calorieRecommendation && (forceCalorie || profile.calorieGoal == null)) {
+    profile.calorieGoal = calorieRecommendation.targetCalories;
+  }
+
+  return {
+    proteinRecommendation,
+    calorieRecommendation,
+  };
+}
+
+function showScreen(target) {
+  const profilePanel = document.querySelector("#profile-panel");
+  profilePanel.hidden = target !== "profile";
+
+  if (target === "today") {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return;
+  }
+
+  if (target === "history") {
+    document.querySelector(".timeline-section").scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+
+  if (target === "profile") {
+    profilePanel.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 }
 
 function showToast(message) {
@@ -289,12 +408,14 @@ function showToast(message) {
 }
 
 function renderApp(state, uiState) {
+  const visibleMeals = filterMealsByDay(state.meals, uiState.dayKey);
   const summary = summarizeDay({
     proteinGoal: state.profile.proteinGoal,
     calorieGoal: state.profile.calorieGoal,
-    meals: state.meals,
+    meals: visibleMeals,
   });
   const recommendation = calculateProteinGoal(state.profile);
+  const calorieRecommendation = getCalorieRecommendation(state.profile);
   const manualPreview = getManualPreview(uiState);
   const scanPreview = getScanPreview(uiState);
   const sheetOpen = uiState.manualOpen || uiState.scanOpen;
@@ -308,17 +429,31 @@ function renderApp(state, uiState) {
   document.querySelector("#consumed-protein").textContent = `${summary.consumedProtein}g`;
   document.querySelector("#protein-goal").textContent = `${state.profile.proteinGoal}g goal`;
   document.querySelector("#remaining-protein").textContent = `${summary.remainingProtein}g left today`;
-  document.querySelector("#remaining-calories").textContent = `${summary.remainingCalories} kcal remaining`;
+  document.querySelector("#remaining-calories").textContent = summary.calorieStatus;
+  document.querySelector("#calorie-copy").textContent = state.profile.calorieGoal == null
+    ? "Calories stay optional until you calculate or set a target."
+    : "Calories stay visible, but protein always leads the page.";
   document.querySelector("#next-action").textContent = suggestNextAction(summary.remainingProtein);
-  document.querySelector("#meal-timeline").innerHTML = renderMealTimeline(state.meals);
+  document.querySelector("#meal-timeline").innerHTML = renderMealTimeline(visibleMeals);
+  document.querySelector("#day-heading-eyebrow").textContent = getDayHeading(uiState.dayKey);
 
   document.querySelector("#setup-card").classList.toggle("is-hidden", state.profile.completedOnboarding);
   document.querySelector("#weight-input").value = String(state.profile.weightKg);
   document.querySelector("#weight-label").textContent = `${state.profile.weightKg} kg`;
+  document.querySelector("#height-input").value = String(state.profile.heightCm);
+  document.querySelector("#age-input").value = String(state.profile.age);
   document.querySelector("#recommended-goal").textContent = `${recommendation.target}g/day recommended • ${recommendation.rangeLabel}`;
-  document.querySelector("#calorie-goal").value = String(state.profile.calorieGoal);
+  document.querySelector("#recommended-calories").textContent = calorieRecommendation?.helperLabel
+    ?? "Add age, height, and sex to estimate calories";
+  document.querySelector("#calorie-goal").value = state.profile.calorieGoal == null ? "" : String(state.profile.calorieGoal);
+  document.querySelector("#calorie-helper").textContent = calorieRecommendation?.helperLabel
+    ?? "We will calculate this if you know your basics.";
   document.querySelector("#image-storage").checked = state.profile.storeMealImages;
-  setActivePills(state.profile);
+  document.querySelector("#profile-weight-input").value = String(state.profile.weightKg);
+  document.querySelector("#profile-height-input").value = String(state.profile.heightCm);
+  document.querySelector("#profile-age-input").value = String(state.profile.age);
+  document.querySelector("#profile-panel").hidden = uiState.activeNav !== "profile";
+  setActivePills(state.profile, uiState);
 
   document.querySelector("#manual-sheet").classList.toggle("is-open", uiState.manualOpen);
   document.querySelector("#scan-sheet").classList.toggle("is-open", uiState.scanOpen);
@@ -349,6 +484,8 @@ function renderApp(state, uiState) {
 function initializeApp() {
   const state = loadState();
   const uiState = {
+    activeNav: "today",
+    dayKey: "today",
     manualOpen: false,
     scanOpen: false,
     manualQuery: "",
@@ -359,10 +496,14 @@ function initializeApp() {
     scanDraft: analyzeScanPreset(scanPresetIds[0]),
   };
 
+  const updateProteinRecommendation = () => {
+    state.profile.proteinGoal = calculateProteinGoal(state.profile).target;
+  };
+
   document.querySelectorAll("[data-goal]").forEach((button) => {
     button.addEventListener("click", () => {
       state.profile.goalType = button.dataset.goal;
-      state.profile.proteinGoal = calculateProteinGoal(state.profile).target;
+      updateProteinRecommendation();
       renderApp(state, uiState);
     });
   });
@@ -370,19 +511,36 @@ function initializeApp() {
   document.querySelectorAll("[data-activity]").forEach((button) => {
     button.addEventListener("click", () => {
       state.profile.activityLevel = button.dataset.activity;
-      state.profile.proteinGoal = calculateProteinGoal(state.profile).target;
+      updateProteinRecommendation();
+      renderApp(state, uiState);
+    });
+  });
+
+  document.querySelectorAll("[data-sex]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.profile.sex = button.dataset.sex;
       renderApp(state, uiState);
     });
   });
 
   document.querySelector("#weight-input").addEventListener("input", (event) => {
     state.profile.weightKg = Number(event.target.value);
-    state.profile.proteinGoal = calculateProteinGoal(state.profile).target;
+    updateProteinRecommendation();
+    renderApp(state, uiState);
+  });
+
+  document.querySelector("#height-input").addEventListener("input", (event) => {
+    state.profile.heightCm = Number(event.target.value);
+    renderApp(state, uiState);
+  });
+
+  document.querySelector("#age-input").addEventListener("input", (event) => {
+    state.profile.age = Number(event.target.value);
     renderApp(state, uiState);
   });
 
   document.querySelector("#calorie-goal").addEventListener("input", (event) => {
-    state.profile.calorieGoal = Number(event.target.value) || defaultProfile.calorieGoal;
+    state.profile.calorieGoal = normalizeCalorieGoal(event.target.value);
     renderApp(state, uiState);
   });
 
@@ -392,6 +550,7 @@ function initializeApp() {
   });
 
   document.querySelector("#apply-profile").addEventListener("click", () => {
+    applyRecommendedTargets(state.profile);
     state.profile.completedOnboarding = true;
     saveState(state);
     renderApp(state, uiState);
@@ -400,6 +559,49 @@ function initializeApp() {
   document.querySelector("#skip-setup").addEventListener("click", () => {
     state.profile.completedOnboarding = true;
     saveState(state);
+    renderApp(state, uiState);
+  });
+
+  document.querySelector("#cult-fuel-logo").addEventListener("click", () => {
+    uiState.activeNav = "today";
+    showScreen("today");
+    renderApp(state, uiState);
+  });
+
+  document.querySelectorAll("[data-nav-target]").forEach((button) => {
+    button.addEventListener("click", () => {
+      uiState.activeNav = button.dataset.navTarget;
+      showScreen(uiState.activeNav);
+      renderApp(state, uiState);
+    });
+  });
+
+  document.querySelector("#day-filter").addEventListener("click", (event) => {
+    const chip = event.target.closest("[data-day-key]");
+    if (!chip) {
+      return;
+    }
+
+    if (chip.dataset.dayKey === "calendar") {
+      const input = document.querySelector("#calendar-input");
+      if (typeof input.showPicker === "function") {
+        input.showPicker();
+      } else {
+        input.click();
+      }
+      return;
+    }
+
+    uiState.dayKey = chip.dataset.dayKey;
+    renderApp(state, uiState);
+  });
+
+  document.querySelector("#calendar-input").addEventListener("change", (event) => {
+    if (!event.target.value) {
+      return;
+    }
+
+    uiState.dayKey = event.target.value;
     renderApp(state, uiState);
   });
 
@@ -496,13 +698,28 @@ function initializeApp() {
     showToast("Scan saved to today");
   });
 
+  document.querySelector("#recalculate-profile").addEventListener("click", () => {
+    state.profile.weightKg = Number(document.querySelector("#profile-weight-input").value);
+    state.profile.heightCm = Number(document.querySelector("#profile-height-input").value);
+    state.profile.age = Number(document.querySelector("#profile-age-input").value);
+
+    applyRecommendedTargets(state.profile, { forceCalorie: true });
+    saveState(state);
+    renderApp(state, uiState);
+    showToast("Targets recalculated");
+  });
+
   document.querySelector("#meal-timeline").addEventListener("click", (event) => {
-    const button = event.target.closest("[data-delete-meal]");
+    const button = event.target.closest("[data-delete-meal-id]");
     if (!button) {
       return;
     }
 
-    const index = Number(button.dataset.deleteMeal);
+    const index = state.meals.findIndex((meal) => meal.id === button.dataset.deleteMealId);
+    if (index === -1) {
+      return;
+    }
+
     const [removed] = state.meals.splice(index, 1);
     saveState(state);
     renderApp(state, uiState);

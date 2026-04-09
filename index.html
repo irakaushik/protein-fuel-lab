@@ -160,20 +160,21 @@
         <article class="glass-card">
           <p class="stat-label">Calories</p>
           <h3 id="remaining-calories">870 kcal remaining</h3>
-          <p>Calories stay visible, but protein always leads the page.</p>
+          <p id="calorie-copy">Calories stay visible, but protein always leads the page.</p>
         </article>
       </section>
 
       <section class="timeline-section">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Today</p>
+            <p class="eyebrow" id="day-heading-eyebrow">Today</p>
             <h2>Meal timeline</h2>
           </div>
           <div class="history-chip-row" id="day-filter">
             <button class="history-chip is-active" data-day-key="today" type="button">Today</button>
             <button class="history-chip" data-day-key="yesterday" type="button">Yesterday</button>
             <button class="history-chip" data-day-key="calendar" type="button">Calendar</button>
+            <input id="calendar-input" type="date" hidden>
           </div>
         </div>
         <div class="meal-timeline" id="meal-timeline"></div>
@@ -229,7 +230,7 @@
         <div class="sheet-grid">
           <div class="sheet-column">
             <label class="control-block" for="manual-search">
-              <span>Recents and common meals</span>
+              <span>Frequent Indian + global meal suggestions</span>
               <input id="manual-search" type="search" placeholder="Search protein foods">
             </label>
             <div class="manual-options" id="manual-options"></div>
