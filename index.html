@@ -16,15 +16,18 @@
     <div class="aurora-wave aurora-wave-bottom" aria-hidden="true"></div>
     <main class="app-shell">
       <header class="topbar">
-        <div class="brand-stack">
-          <div class="cult-brand" aria-label="Cult brand">
-            <span class="cult-brand-chip">cult</span>
-            <span class="cult-brand-fit">.fit</span>
-          </div>
-          <p class="brand-kicker">Aurora design language</p>
-          <h1>Cult Fuel Log</h1>
-        </div>
-        <p class="topbar-chip">Protein-first tracker</p>
+        <button class="brand-lockup" id="cult-fuel-logo" type="button" aria-label="Cult Fuel Log home">
+          <span class="vman-mark" aria-hidden="true">
+            <svg viewBox="0 0 64 64" role="presentation">
+              <path d="M10 16 31 48 54 16" />
+              <path d="M22 16 31 29 42 16" />
+            </svg>
+          </span>
+          <span class="brand-copy">
+            <small>CULT</small>
+            <strong>FUEL LOG</strong>
+          </span>
+        </button>
       </header>
 
       <section class="setup-card" id="setup-card">
@@ -58,6 +61,22 @@
           </label>
           <input id="weight-input" type="range" min="45" max="120" value="72">
 
+          <div class="inline-fields">
+            <label class="control-block" for="height-input">
+              <span>Height</span>
+              <input id="height-input" type="number" min="140" max="210" value="178">
+            </label>
+            <label class="control-block" for="age-input">
+              <span>Age</span>
+              <input id="age-input" type="number" min="16" max="80" value="30">
+            </label>
+          </div>
+
+          <div class="pill-group" id="sex-group">
+            <button class="pill-button is-active" data-sex="male" type="button">Male</button>
+            <button class="pill-button" data-sex="female" type="button">Female</button>
+          </div>
+
           <div class="pill-group">
             <button class="pill-button" data-goal="lose" type="button">Lose</button>
             <button class="pill-button is-active" data-goal="gain" type="button">Gain</button>
@@ -72,7 +91,8 @@
 
           <label class="control-block" for="calorie-goal">
             <span>Calorie target</span>
-            <input id="calorie-goal" type="number" min="1200" step="50" value="2200">
+            <input id="calorie-goal" type="number" min="1200" step="50" value="2200" placeholder="Optional">
+            <small id="calorie-helper">We will calculate this if you know your basics.</small>
           </label>
 
           <label class="toggle">
@@ -81,9 +101,10 @@
           </label>
 
           <p class="recommendation" id="recommended-goal">158g/day recommended</p>
+          <p class="recommendation secondary" id="recommended-calories">2616 kcal maintain • 2866 kcal target</p>
 
           <div class="setup-actions">
-            <button id="apply-profile" class="primary-action" type="button">Use target</button>
+            <button id="apply-profile" class="primary-action" type="button">Use targets</button>
             <button id="skip-setup" class="secondary-action" type="button">Skip for now</button>
           </div>
         </div>
@@ -91,7 +112,6 @@
 
       <section class="hero-card">
         <div class="hero-copy">
-          <p class="eyebrow">Aurora Performance Nutrition</p>
           <h2 class="hero-title">Today’s protein progress stays in front of every decision.</h2>
           <p class="hero-subtitle">Fast manual logging, AI-assisted meal scan, and one dashboard that tells you exactly what to eat next.</p>
           <div class="cta-row">
@@ -150,13 +170,49 @@
             <p class="eyebrow">Today</p>
             <h2>Meal timeline</h2>
           </div>
-          <div class="history-chip-row">
-            <button class="history-chip is-active" type="button">Today</button>
-            <button class="history-chip" type="button">Yesterday</button>
-            <button class="history-chip" type="button">Calendar</button>
+          <div class="history-chip-row" id="day-filter">
+            <button class="history-chip is-active" data-day-key="today" type="button">Today</button>
+            <button class="history-chip" data-day-key="yesterday" type="button">Yesterday</button>
+            <button class="history-chip" data-day-key="calendar" type="button">Calendar</button>
           </div>
         </div>
         <div class="meal-timeline" id="meal-timeline"></div>
+      </section>
+
+      <section class="transform-card glass-card">
+        <p class="eyebrow">Continue with Cult</p>
+        <h2>Go beyond logging with Cult Transform</h2>
+        <p>Structured coaching, accountability, and progression if you want a bigger change than logging alone.</p>
+        <ul class="transform-list">
+          <li>Goal-led coaching</li>
+          <li>Habit and nutrition accountability</li>
+          <li>Structured training journey</li>
+        </ul>
+        <a class="primary-action transform-link" href="https://www.cult.fit/fitness/cult-transform" target="_blank" rel="noreferrer">Open in Cult app</a>
+      </section>
+
+      <section class="profile-panel glass-card" id="profile-panel" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Profile</p>
+            <h2>Recalculate targets</h2>
+          </div>
+          <button class="secondary-action" id="recalculate-profile" type="button">Recalculate targets</button>
+        </div>
+        <div class="profile-grid">
+          <label class="control-block" for="profile-weight-input">
+            <span>Weight</span>
+            <input id="profile-weight-input" type="number" min="45" max="120" value="72">
+          </label>
+          <label class="control-block" for="profile-height-input">
+            <span>Height</span>
+            <input id="profile-height-input" type="number" min="140" max="210" value="178">
+          </label>
+          <label class="control-block" for="profile-age-input">
+            <span>Age</span>
+            <input id="profile-age-input" type="number" min="16" max="80" value="30">
+          </label>
+        </div>
       </section>
 
       <div class="sheet-backdrop" id="sheet-backdrop" hidden></div>
@@ -246,9 +302,9 @@
       </section>
 
       <nav class="bottom-nav" aria-label="Primary">
-        <button class="nav-item is-active" type="button">Today</button>
-        <button class="nav-item" type="button">History</button>
-        <button class="nav-item" type="button">Profile</button>
+        <button class="nav-item is-active" data-nav-target="today" type="button">Today</button>
+        <button class="nav-item" data-nav-target="history" type="button">History</button>
+        <button class="nav-item" data-nav-target="profile" type="button">Profile</button>
       </nav>
 
       <div class="save-toast" id="save-toast" aria-live="polite"></div>

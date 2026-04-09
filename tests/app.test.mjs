@@ -70,12 +70,13 @@ test("index.html contains the primary product CTAs", async () => {
   assert.match(html, /Today/);
 });
 
-test("index.html includes Cult brand treatment and illustration hooks", async () => {
+test("index.html includes illustration hooks and no old cult.fit chip header", async () => {
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 
-  assert.match(html, /aria-label="Cult brand"/);
   assert.match(html, /aurora-illustration/);
   assert.doesNotMatch(html, /Aurora design language/);
+  assert.doesNotMatch(html, /cult-brand-fit/);
+  assert.doesNotMatch(html, /Protein-first tracker/);
 });
 
 test("index.html does not include the old Aurora performance eyebrow", async () => {
@@ -195,4 +196,30 @@ test("createScanDraft returns an editable scan result with disclaimer copy", () 
   assert.ok(Array.isArray(draft.items));
   assert.ok(draft.items.length > 0);
   assert.equal(typeof draft.totals.protein, "number");
+});
+
+test("index.html contains the animated Cult Fuel Log logo shell", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+
+  assert.match(html, /id="cult-fuel-logo"/);
+  assert.match(html, /class="vman-mark"/);
+  assert.match(html, /FUEL LOG/);
+});
+
+test("index.html includes profile recalculation and Cult Transform sections", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+
+  assert.match(html, /id="profile-panel"/);
+  assert.match(html, /Recalculate targets/);
+  assert.match(html, /Go beyond logging with Cult Transform/);
+  assert.match(html, /https:\/\/www\.cult\.fit\/fitness\/cult-transform/);
+});
+
+test("index.html includes mobile day chips and bottom nav targets", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+
+  assert.match(html, /id="day-filter"/);
+  assert.match(html, /data-day-key="today"/);
+  assert.match(html, /data-nav-target="history"/);
+  assert.match(html, /data-nav-target="profile"/);
 });
