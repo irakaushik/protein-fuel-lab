@@ -54,6 +54,13 @@ test("index.html contains the primary product CTAs", async () => {
   assert.match(html, /Today/);
 });
 
+test("index.html includes Cult brand treatment and illustration hooks", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+
+  assert.match(html, /aria-label="Cult brand"/);
+  assert.match(html, /aurora-illustration/);
+});
+
 test("calculateProteinGoal supports intense training with a stronger target", () => {
   const result = calculateProteinGoal({
     weightKg: 80,

@@ -24,6 +24,7 @@ html {
     radial-gradient(circle at top left, rgba(255, 143, 50, 0.26), transparent 28%),
     radial-gradient(circle at top right, rgba(67, 231, 197, 0.14), transparent 24%),
     linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
+  overflow-x: hidden;
 }
 
 body {
@@ -59,6 +60,37 @@ button {
   opacity: 0.38;
 }
 
+.aurora-wave {
+  position: fixed;
+  inset: auto;
+  width: 72vw;
+  height: 20rem;
+  border-radius: 50%;
+  filter: blur(26px);
+  opacity: 0.36;
+  pointer-events: none;
+  animation: aurora-drift 16s ease-in-out infinite alternate;
+}
+
+.aurora-wave-top {
+  top: -6rem;
+  left: 8%;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(255, 143, 50, 0.65), transparent 34%),
+    radial-gradient(circle at 55% 50%, rgba(255, 199, 107, 0.34), transparent 28%),
+    radial-gradient(circle at 80% 60%, rgba(67, 231, 197, 0.28), transparent 26%);
+}
+
+.aurora-wave-bottom {
+  right: -12%;
+  bottom: 4rem;
+  background:
+    radial-gradient(circle at 20% 40%, rgba(67, 231, 197, 0.35), transparent 32%),
+    radial-gradient(circle at 50% 60%, rgba(188, 255, 107, 0.24), transparent 28%),
+    radial-gradient(circle at 75% 50%, rgba(255, 143, 50, 0.34), transparent 30%);
+  animation-duration: 20s;
+}
+
 .page-glow-left {
   top: -8rem;
   left: -6rem;
@@ -92,6 +124,45 @@ button {
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 1.5rem;
+}
+
+.brand-stack {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.cult-brand {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 0.28rem 0.38rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.34);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
+}
+
+.cult-brand-chip,
+.cult-brand-fit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2rem;
+  padding: 0.1rem 0.78rem;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-radius: 999px;
+}
+
+.cult-brand-chip {
+  color: #05090e;
+  background: linear-gradient(135deg, #ffffff, #cfd8de);
+}
+
+.cult-brand-fit {
+  color: var(--text);
 }
 
 .topbar h1,
@@ -168,6 +239,29 @@ button {
 .setup-copy p:last-child {
   max-width: 30rem;
   color: var(--muted);
+}
+
+.aurora-illustration {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.5rem;
+  background:
+    radial-gradient(circle at top left, rgba(255, 143, 50, 0.16), transparent 36%),
+    linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)),
+    rgba(255,255,255,0.03);
+}
+
+.aurora-illustration svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.setup-illustration {
+  max-width: 24rem;
+  margin-top: 1.3rem;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
 }
 
 .setup-controls {
@@ -272,6 +366,12 @@ input[type="search"],
   pointer-events: none;
 }
 
+.hero-meter-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
 .hero-title {
   margin: 0.4rem 0 0.8rem;
   font-size: clamp(2rem, 4vw, 3rem);
@@ -295,9 +395,20 @@ input[type="search"],
 }
 
 .hero-meter {
+  position: relative;
+  z-index: 1;
   display: grid;
   place-items: center;
   gap: 0.45rem;
+}
+
+.hero-illustration {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: min(100%, 24rem);
+  transform: translate(-50%, -50%);
+  opacity: 0.9;
+  animation: breathe 9s ease-in-out infinite;
 }
 
 .ring {
@@ -500,6 +611,12 @@ input[type="search"],
   transition: transform 240ms ease;
 }
 
+.sheet.is-open .preview-card,
+.sheet.is-open .scan-card.is-active,
+.sheet.is-open .option-card.is-active {
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.2);
+}
+
 .sheet.is-open {
   transform: translate(-50%, 0);
 }
@@ -655,6 +772,25 @@ input[type="search"],
   transform: translate(-50%, 0);
 }
 
+@keyframes aurora-drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(4%, 2%, 0) scale(1.08);
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+}
+
 .bottom-nav {
   position: sticky;
   bottom: 1rem;
@@ -688,6 +824,10 @@ input[type="search"],
     flex-direction: column;
   }
 
+  .cult-brand {
+    align-self: flex-start;
+  }
+
   .ring {
     width: 12rem;
   }
@@ -701,6 +841,10 @@ input[type="search"],
   .sheet-header {
     width: 100%;
     justify-items: start;
+  }
+
+  .hero-illustration {
+    width: 18rem;
   }
 
   .sheet {

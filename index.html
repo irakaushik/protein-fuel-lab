@@ -12,10 +12,16 @@
   <body>
     <div class="page-glow page-glow-left"></div>
     <div class="page-glow page-glow-right"></div>
+    <div class="aurora-wave aurora-wave-top" aria-hidden="true"></div>
+    <div class="aurora-wave aurora-wave-bottom" aria-hidden="true"></div>
     <main class="app-shell">
       <header class="topbar">
-        <div>
-          <p class="brand-kicker">cult.fit aurora concept</p>
+        <div class="brand-stack">
+          <div class="cult-brand" aria-label="Cult brand">
+            <span class="cult-brand-chip">cult</span>
+            <span class="cult-brand-fit">.fit</span>
+          </div>
+          <p class="brand-kicker">Aurora design language</p>
           <h1>Cult Fuel Log</h1>
         </div>
         <p class="topbar-chip">Protein-first tracker</p>
@@ -26,6 +32,23 @@
           <p class="eyebrow">Set your daily target</p>
           <h2>Build your fuel profile in under 20 seconds.</h2>
           <p>We recommend a protein target from your weight, goal, and training load, then keep it editable.</p>
+          <div class="aurora-illustration setup-illustration" aria-hidden="true">
+            <svg viewBox="0 0 320 180" role="presentation">
+              <defs>
+                <linearGradient id="setup-glow" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#ff8f32" />
+                  <stop offset="100%" stop-color="#43e7c5" />
+                </linearGradient>
+              </defs>
+              <circle cx="78" cy="90" r="46" fill="rgba(255,143,50,0.16)" />
+              <circle cx="236" cy="76" r="58" fill="rgba(67,231,197,0.12)" />
+              <path d="M48 124c31-28 66-41 105-41 35 0 68 10 118 36" stroke="url(#setup-glow)" stroke-width="10" stroke-linecap="round" fill="none"/>
+              <rect x="56" y="48" width="68" height="44" rx="16" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.18)" />
+              <rect x="154" y="34" width="112" height="64" rx="24" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.14)" />
+              <path d="M193 67h34" stroke="#bcff6b" stroke-width="10" stroke-linecap="round" />
+              <path d="M87 68h14" stroke="#ffc76b" stroke-width="10" stroke-linecap="round" />
+            </svg>
+          </div>
         </div>
 
         <div class="setup-controls">
@@ -77,7 +100,25 @@
           </div>
         </div>
 
-        <div class="hero-meter">
+        <div class="hero-meter-wrap">
+          <div class="aurora-illustration hero-illustration" aria-hidden="true">
+            <svg viewBox="0 0 320 320" role="presentation">
+              <defs>
+                <linearGradient id="hero-line" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#43e7c5" />
+                  <stop offset="50%" stop-color="#bcff6b" />
+                  <stop offset="100%" stop-color="#ff8f32" />
+                </linearGradient>
+              </defs>
+              <circle cx="160" cy="160" r="126" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)"/>
+              <circle cx="160" cy="160" r="102" fill="none" stroke="rgba(255,255,255,0.08)"/>
+              <path d="M86 219c24-48 49-86 77-114 15-14 35-29 60-45" stroke="url(#hero-line)" stroke-width="14" stroke-linecap="round" fill="none"/>
+              <path d="M120 92c18 4 36 5 52 4" stroke="#ffc76b" stroke-width="10" stroke-linecap="round" fill="none"/>
+              <path d="M122 247c38 8 73 9 111 0" stroke="rgba(255,255,255,0.18)" stroke-width="8" stroke-linecap="round" fill="none"/>
+              <circle cx="218" cy="94" r="18" fill="rgba(67,231,197,0.16)"/>
+            </svg>
+          </div>
+          <div class="hero-meter">
           <div class="ring" id="protein-ring">
             <div class="ring-core">
               <span id="progress-percent">62%</span>
@@ -86,6 +127,7 @@
           </div>
           <p class="protein-value" id="consumed-protein">112g</p>
           <p class="protein-goal" id="protein-goal">158g goal</p>
+        </div>
         </div>
       </section>
 
